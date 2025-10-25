@@ -1,9 +1,9 @@
 #pragma once
-#include <GL/glew.h>
+
 
 class VAO {
 private:
-    GLuint ID;
+    unsigned int ID;
 
 public:
     VAO();
@@ -12,5 +12,5 @@ public:
     void Bind() const;
     void Unbind() const;
 
-    void AddAttrib(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void* pointer);
+    void AddAttrib(int index, int size, unsigned int type, bool normalized, unsigned int stride, const void* pointer);
 };

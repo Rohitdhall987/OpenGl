@@ -3,10 +3,10 @@
 
 class EBO {
 private:
-    GLuint ID;
+    unsigned int ID;
 
 public:
-    EBO(unsigned int* indices, size_t size);
+    EBO(unsigned int* indices, unsigned int size);
     ~EBO();
 
     void Bind() const;

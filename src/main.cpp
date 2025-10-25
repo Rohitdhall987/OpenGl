@@ -1,18 +1,20 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <iostream>
+#include <stb/stb_image.h>
 
 #include "headers/callback.h"
 #include "headers/VAO.h"
 #include "headers/VBO.h"
 #include "headers/EBO.h"
 #include "headers/shader.h"
+#include "headers/texture.h"
 
 float vertices[] = {
-     0.5f,  0.5f, 0.0f,  // top right
-     0.5f, -0.5f, 0.0f,  // bottom right
-    -0.5f, -0.5f, 0.0f,  // bottom left
-    -0.5f,  0.5f, 0.0f   // top left 
+     0.7f,  0.7f, 0.0f,         1.0f, 1.0f, // top right
+     0.7f, -0.7f, 0.0f,         1.0f, 0.0f, // bottom right
+    -0.7f, -0.7f, 0.0f,         0.0f, 0.0f, // bottom left
+    -0.7f,  0.7f, 0.0f,         0.0f, 1.0f, // top left 
+
 };
 unsigned int indices[] = { 
     0, 1, 3,   // first triangle
@@ -40,7 +42,8 @@ int main(void)
     vbo.Bind();
     ebo.Bind();
 
-    vao.AddAttrib(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);  
+    vao.AddAttrib(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);  
+    vao.AddAttrib(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 
     vao.Unbind();
     vbo.Unbind();
@@ -49,14 +52,17 @@ int main(void)
     Shader shader("src/shaders/vertex.glsl", "src/shaders/frag.glsl");
     shader.Use();
 
+    Texture cry_girl_t("resources/textures/crying_girl.png");
+
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     while (!glfwWindowShouldClose(window)) {
 
-        glClearColor(0.3f,0.3f,0.7f,1.0f);
+        glClearColor(0.25f, 0.66f, 0.63f,1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-
+        
+        cry_girl_t.Bind();
         vao.Bind();
         glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(float), GL_UNSIGNED_INT, 0);
         

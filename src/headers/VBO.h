@@ -3,10 +3,10 @@
 
 class VBO {
 private:
-    GLuint ID;
+    unsigned int ID;
 
 public:
-    VBO(float* vertices, size_t size);
+    VBO(float* vertices, unsigned int size);
     ~VBO();
 
     void Bind() const;

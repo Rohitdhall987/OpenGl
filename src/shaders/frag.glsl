@@ -1,7 +1,10 @@
 #version 330 core
+
 out vec4 FragColor;
 
 in vec2 vTexCoord;
+
+uniform sampler2D ourTexture;
 
 void main()
 {
@@ -16,6 +19,6 @@ void main()
     if (dist < radius)
         opacity = 1.0;
         
-
-    FragColor = vec4(1.0, 0.5, 0.2, opacity);
+    vec4 t = texture(ourTexture, vec2(vTexCoord.x,vTexCoord.y+0.125));
+    FragColor = vec4(mix(vec3(1),t.rgb,t.a), opacity);
 } 

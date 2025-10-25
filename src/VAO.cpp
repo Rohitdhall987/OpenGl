@@ -1,4 +1,5 @@
 #include "headers/VAO.h"
+#include <GL/glew.h>
 
 VAO::VAO() {
     glGenVertexArrays(1, &ID);
@@ -16,7 +17,7 @@ void VAO::Unbind() const {
     glBindVertexArray(0);
 }
 
-void VAO::AddAttrib(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void* pointer) {
+void VAO::AddAttrib(int index, int size, unsigned int type, bool normalized, unsigned int stride, const void* pointer) {
     glVertexAttribPointer(index, size, type, normalized, stride, pointer);
     glEnableVertexAttribArray(index);
 }
