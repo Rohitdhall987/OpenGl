@@ -13,16 +13,54 @@
 #include "headers/texture.h"
 
 float vertices[] = {
-     0.7f,  0.7f, 0.0f,         1.0f, 1.0f, // top right
-     0.7f, -0.7f, 0.0f,         1.0f, 0.0f, // bottom right
-    -0.7f, -0.7f, 0.0f,         0.0f, 0.0f, // bottom left
-    -0.7f,  0.7f, 0.0f,         0.0f, 1.0f, // top left 
+    // positions           // texture coords
+    // Back face
+    -0.5f, -0.5f, -0.5f,   0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,   1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,   1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,   0.0f, 1.0f,
 
+    // Front face
+    -0.5f, -0.5f,  0.5f,   0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,   1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,   1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,   0.0f, 1.0f,
+
+    // Left face
+    -0.5f, -0.5f,  0.5f,   1.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,   0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,   0.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,   1.0f, 1.0f,
+
+    // Right face
+     0.5f, -0.5f, -0.5f,   1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,   0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,   0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,   1.0f, 1.0f,
+
+     // Bottom face
+     -0.5f, -0.5f, -0.5f,   0.0f, 1.0f,
+      0.5f, -0.5f, -0.5f,   1.0f, 1.0f,
+      0.5f, -0.5f,  0.5f,   1.0f, 0.0f,
+     -0.5f, -0.5f,  0.5f,   0.0f, 0.0f,
+
+     // Top face
+     -0.5f,  0.5f, -0.5f,   0.0f, 0.0f,
+      0.5f,  0.5f, -0.5f,   1.0f, 0.0f,
+      0.5f,  0.5f,  0.5f,   1.0f, 1.0f,
+     -0.5f,  0.5f,  0.5f,   0.0f, 1.0f
 };
-unsigned int indices[] = { 
-    0, 1, 3,   // first triangle
-    1, 2, 3    // second triangle
+
+
+unsigned int indices[] = {
+    0, 1, 2, 2, 3, 0,       // back
+    4, 5, 6, 6, 7, 4,       // front
+    8, 9,10,10,11, 8,       // left
+   12,13,14,14,15,12,       // right
+   16,17,18,18,19,16,       // bottom
+   20,21,22,22,23,20        // top
 };
+
 
 int main(void)
 {
@@ -62,8 +100,12 @@ int main(void)
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    unsigned int trans_loc = shader.GetUniform("transform");
+    unsigned int MVP_loc = shader.GetUniform("MVP");
     float rotation = 0.0f;
+
+    glm::mat4 proj = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
+    glm::mat4 view = glm::mat4(1.0f);
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f,-4.0f));
 
     while (!glfwWindowShouldClose(window)) {
 
@@ -74,14 +116,16 @@ int main(void)
             rotation += 0.75f;
         }
 
-        glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::rotate(trans, glm::radians(rotation), glm::vec3(0.0f, 0.0f, 1.0f));
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 1.0f));
 
+        glm::mat4 MVP = proj * view * model;
 
         glClearColor(0.25f, 0.66f, 0.63f,1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glUniformMatrix4fv(trans_loc, 1, GL_FALSE, glm::value_ptr(trans));
+        glUniformMatrix4fv(MVP_loc, 1, GL_FALSE, glm::value_ptr(MVP));
         
         cry_girl_t.Bind();
         vao.Bind();
