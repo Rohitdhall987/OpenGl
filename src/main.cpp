@@ -89,7 +89,7 @@ int main(void)
     vbo.Unbind();
     ebo.Unbind();
 
-    Shader shader("src/shaders/vertex.glsl", "src/shaders/frag.glsl");
+    Shader shader("resources/shaders/vertex.glsl", "resources/shaders/frag.glsl");
     shader.Use();
 
     Texture cry_girl_t("resources/textures/crying_girl.png");
@@ -134,7 +134,6 @@ int main(void)
         
         cry_girl_t.Bind();
         vao.Bind();
-        glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(float), GL_UNSIGNED_INT, 0);
         
         lastFrame = currentFrame;
         glfwSwapBuffers(window);
