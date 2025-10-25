@@ -17,7 +17,7 @@ public:
 
     void Use() const;
 
-    void SetUniform(const std::string& name, float value) const;
+    unsigned int GetUniform(std::string name) const;
 
     GLuint GetID() const { return ID; }
 };

@@ -82,7 +82,7 @@ void Shader::CheckCompileErrors(GLuint shader, const std::string& type) const {
     }
 }
 
-void Shader::SetUniform(const std::string& name, float value) const {
-    GLint loc = glGetUniformLocation(ID, name.c_str());
-    glUniform1f(loc, value);
+
+unsigned int Shader::GetUniform(std::string name) const {
+    return glGetUniformLocation(ID, name.c_str());
 }
