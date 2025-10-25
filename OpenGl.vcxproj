@@ -130,6 +130,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\EBO.cpp" />
+    <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\texture.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\callback.cpp" />
@@ -140,6 +141,7 @@
   <ItemGroup>
     <ClInclude Include="libraries\include\stb\stb_image.h" />
     <ClInclude Include="src\headers\callback.h" />
+    <ClInclude Include="src\headers\camera.h" />
     <ClInclude Include="src\headers\EBO.h" />
     <ClInclude Include="src\headers\shader.h" />
     <ClInclude Include="src\headers\texture.h" />

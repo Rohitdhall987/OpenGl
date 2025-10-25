@@ -11,6 +11,7 @@
 #include "headers/EBO.h"
 #include "headers/shader.h"
 #include "headers/texture.h"
+#include "headers/camera.h"
 
 float vertices[] = {
     // positions           // texture coords
@@ -71,11 +72,7 @@ int main(void)
     GLFWwindow* window = glfwCreateWindow(800, 800, "LEARN OPENGL", NULL, NULL);
     glfwMakeContextCurrent(window);
 
-    glfwSwapInterval(1);
-
     glewInit();
-
-    glfwSetFramebufferSizeCallback(window, Callback::frameSizeCallBack);
 
     VAO vao;
     VBO vbo(vertices, sizeof(vertices));
@@ -101,25 +98,33 @@ int main(void)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     unsigned int MVP_loc = shader.GetUniform("MVP");
-    float rotation = 0.0f;
 
-    glm::mat4 proj = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
-    glm::mat4 view = glm::mat4(1.0f);
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f,-4.0f));
+    
+
+    float deltaTime = 0.0f;	
+    float lastFrame = 0.0f;
+
+    Camera camera;
+
+    glfwSetWindowUserPointer(window, &camera);
+    glfwSwapInterval(1);
+    glfwSetFramebufferSizeCallback(window, Callback::frameSizeCallBack);
+    glfwSetCursorPosCallback(window, Callback::MouseCallback);
+    glfwSetScrollCallback(window, Callback::ScrollCallback);
+    glfwSetKeyCallback(window,Callback::KeyCallback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     while (!glfwWindowShouldClose(window)) {
 
-        if (rotation >= 360.0f) {
-            rotation = 0.0f;
-        }
-        else {
-            rotation += 0.75f;
-        }
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        
+
+        camera.ProcessInput(window,deltaTime);
 
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 1.0f));
 
-        glm::mat4 MVP = proj * view * model;
+        glm::mat4 MVP = camera.GetProjection() * camera.GetView() * model;
 
         glClearColor(0.25f, 0.66f, 0.63f,1.0f);
         glEnable(GL_DEPTH_TEST);
@@ -131,6 +136,7 @@ int main(void)
         vao.Bind();
         glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(float), GL_UNSIGNED_INT, 0);
         
+        lastFrame = currentFrame;
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
