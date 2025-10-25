@@ -129,7 +129,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\EBO.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\callback.cpp" />
+    <ClCompile Include="src\shader.cpp" />
+    <ClCompile Include="src\VAO.cpp" />
+    <ClCompile Include="src\VBO.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\headers\callback.h" />
+    <ClInclude Include="src\headers\EBO.h" />
+    <ClInclude Include="src\headers\shader.h" />
+    <ClInclude Include="src\headers\VAO.h" />
+    <ClInclude Include="src\headers\VBO.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shaders\frag.glsl" />
+    <None Include="src\shaders\vertex.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
