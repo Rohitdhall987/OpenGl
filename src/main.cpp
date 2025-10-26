@@ -10,46 +10,48 @@
 #include "headers/VBO.h"
 #include "headers/EBO.h"
 #include "headers/shader.h"
+#include "headers/texture.h"
 #include "headers/camera.h"
 
 float vertices[] = {
-    // positions        // texture coords
+    // positions          // normals           // texture coords
     // Back face
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,   0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,   0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
 
     // Front face
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,   0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,   0.0f,  0.0f,  1.0f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,   0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,   0.0f,  0.0f,  1.0f,  0.0f, 1.0f,
 
     // Left face
-    -0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
 
     // Right face
-     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,   1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,   1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,   1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,   1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
 
      // Bottom face
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     -0.5f, -0.5f, -0.5f,   0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+      0.5f, -0.5f, -0.5f,   0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+      0.5f, -0.5f,  0.5f,   0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+     -0.5f, -0.5f,  0.5f,   0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
 
-    // Top face
-   -0.5f,  0.5f, -0.5f,  0.0f, 0.0f,
-    0.5f,  0.5f, -0.5f,  1.0f, 0.0f,
-    0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-   -0.5f,  0.5f,  0.5f,  0.0f, 1.0f
+     // Top face
+    -0.5f,  0.5f, -0.5f,   0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,   0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,   0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,   0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 };
+
 
 
 unsigned int indices[] = {
@@ -85,11 +87,10 @@ int main(void)
     vao.Bind();
     vbo.Bind();
     ebo.Bind();
-
  
-    vao.AddAttrib(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
-
-
+    vao.AddAttrib(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), 0);
+    vao.AddAttrib(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    vao.AddAttrib(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 
     vao.Unbind();
     vbo.Unbind();
@@ -100,40 +101,34 @@ int main(void)
     // LIGHT (VAO) SETUP 
     // ----------------------------------------------------------------------
 
+    glm::vec3 light_pos = glm::vec3(1.2f, 1.2f, 0.2f);
+    glm::vec3 light_clr = glm::vec3(1.0f, 1.0f, 1.0f);
+
     VAO light;
     light.Bind();
     vbo.Bind();  
     ebo.Bind();  
-    light.AddAttrib(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
+    light.AddAttrib(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), 0);
+    light.AddAttrib(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    light.AddAttrib(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 
     light.Unbind();
     vbo.Unbind();
     ebo.Unbind();
     // ----------------------------------------------------------------------
 
+    Texture cry_girl_t("resources/textures/crying_girl.png");
+
+    cry_girl_t.Bind();
 
     Shader shader("resources/shaders/vertex.glsl", "resources/shaders/frag.glsl");
 
-    Shader light_shader("resources/shaders/vertex.glsl", "resources/shaders/light_frag.glsl");
+    Shader light_shader("resources/shaders/vertex.glsl", "resources/shaders/color.glsl");
 
     
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    unsigned int model_loc = shader.GetUniform("model");
-    unsigned int view_loc = shader.GetUniform("view");
-    unsigned int proj_loc = shader.GetUniform("projection");
-    unsigned int object_color = shader.GetUniform("object_color");
-
-
-    unsigned int light_model_loc = light_shader.GetUniform("model");
-    unsigned int light_view_loc = light_shader.GetUniform("view");
-    unsigned int light_proj_loc = light_shader.GetUniform("projection");
-    unsigned int light_object_color = light_shader.GetUniform("object_color");
-
-    float deltaTime = 0.0f;
-    float lastFrame = 0.0f;
 
     Camera camera;
 
@@ -145,40 +140,57 @@ int main(void)
     glfwSetKeyCallback(window, Callback::KeyCallback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    while (!glfwWindowShouldClose(window)) {
 
+    float rotation = 0.0f;
+    float deltaTime = 0.0f;
+    float lastFrame = 0.0f;
+
+    while (!glfwWindowShouldClose(window)) {
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
 
+        rotation += 50.0f * deltaTime;
+
+        if (rotation >= 360) {
+            rotation = 0.0f;
+        }
 
         camera.ProcessInput(window, deltaTime);
 
-        glm::mat4 model = glm::mat4(1.0f);
-        // glClearColor(0.25f, 0.66f, 0.63f,1.0f);     //nice color to use later
-        glClearColor(0.035f, 0.035f, 0.035f, 1.0f);
+        
+         glClearColor(0.25f/2, 0.66f/2, 0.63f/2,1.0f);    
+        //glClearColor(0.035f, 0.035f, 0.035f, 1.0f);
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
         // --- CUBE RENDER ---
         shader.Use();
-        glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(camera.GetView()));
-        glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(camera.GetProjection()));
-
-        glUniform3fv(object_color, 1, glm::value_ptr(glm::vec3(0.3f, 1.0f, 0.4f)));
+        shader.SetMat4("model", glm::mat4(1.0f));
+        shader.SetMat4("view", camera.GetView());
+        shader.SetMat4("projection", camera.GetProjection());
 
         vao.Bind();
+
+        glm::mat4 rotMat = glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::vec3 rotatedLightPos = glm::vec3(rotMat * glm::vec4(light_pos, 1.0f));
+
+        shader.SetVec3("objectColor", glm::vec3(0.3f, 1.0f, 0.4f));
+        shader.SetVec3("lightPos", rotatedLightPos);
+        shader.SetVec3("lightColor", light_clr);
+        shader.SetVec3("viewPos", camera.cameraPos);
+
         glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
 
         // --- LIGHT RENDER ---
         light_shader.Use();
-        model = glm::translate(model, glm::vec3(1.2f, 1.2f, 0.2f));
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), rotatedLightPos);
         model = glm::scale(model, glm::vec3(0.2f));
-        glUniformMatrix4fv(light_model_loc, 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(light_view_loc, 1, GL_FALSE, glm::value_ptr(camera.GetView()));
-        glUniformMatrix4fv(light_proj_loc, 1, GL_FALSE, glm::value_ptr(camera.GetProjection()));
-        glUniform3fv(light_object_color, 1, glm::value_ptr(glm::vec3(1.0f, 1.0f, 1.0f)));
-        light.Bind(); 
+        light_shader.SetMat4("model", model);
+        light_shader.SetMat4("view", camera.GetView());
+        light_shader.SetMat4("projection", camera.GetProjection());
+        light_shader.SetVec3("objectColor", light_clr);
+        light.Bind();
         glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
 
 

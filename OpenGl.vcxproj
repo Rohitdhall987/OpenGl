@@ -149,7 +149,7 @@
     <ClInclude Include="src\headers\VBO.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\shaders\light_frag.glsl" />
+    <None Include="resources\shaders\color.glsl" />
     <None Include="src\shaders\frag.glsl" />
     <None Include="src\shaders\vertex.glsl" />
   </ItemGroup>

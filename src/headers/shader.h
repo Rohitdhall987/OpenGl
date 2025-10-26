@@ -1,5 +1,6 @@
 #pragma once
 #include <GL/glew.h>
+#include <glm/gtc/type_ptr.hpp>
 #include <string>
 
 class Shader {
@@ -18,6 +19,9 @@ public:
     void Use() const;
 
     unsigned int GetUniform(std::string name) const;
+
+    void SetVec3(std::string name, glm::vec3 value) const;
+    void SetMat4(std::string name, glm::mat4 value) const;
 
     GLuint GetID() const { return ID; }
 };

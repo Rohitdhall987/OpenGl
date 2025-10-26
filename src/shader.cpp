@@ -86,3 +86,15 @@ void Shader::CheckCompileErrors(GLuint shader, const std::string& type) const {
 unsigned int Shader::GetUniform(std::string name) const {
     return glGetUniformLocation(ID, name.c_str());
 }
+
+void Shader::SetVec3(std::string name, glm::vec3 value) const
+{
+    unsigned int loc=glGetUniformLocation(ID, name.c_str());
+    glUniform3fv(loc, 1, glm::value_ptr(value));
+}
+
+void Shader::SetMat4(std::string name, glm::mat4 value) const
+{
+    unsigned int loc = glGetUniformLocation(ID, name.c_str());
+    glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
+}
