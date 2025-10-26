@@ -69,5 +69,6 @@
   <ItemGroup>
     <None Include="src\shaders\vertex.glsl" />
     <None Include="src\shaders\frag.glsl" />
+    <None Include="resources\shaders\light_frag.glsl" />
   </ItemGroup>
 </Project>
