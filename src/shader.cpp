@@ -7,8 +7,8 @@ Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
     std::string vertexCode = ReadFile(vertexPath);
     std::string fragmentCode = ReadFile(fragmentPath);
 
-    GLuint vertex = CompileVertexShader(vertexCode);
-    GLuint fragment = CompileFragmentShader(fragmentCode);
+    unsigned int vertex = CompileVertexShader(vertexCode);
+    unsigned int fragment = CompileFragmentShader(fragmentCode);
 
     ID = glCreateProgram();
     glAttachShader(ID, vertex);
@@ -41,8 +41,8 @@ std::string Shader::ReadFile(const std::string& path) const {
     return ss.str();
 }
 
-GLuint Shader::CompileVertexShader(const std::string& code) const {
-    GLuint shader = glCreateShader(GL_VERTEX_SHADER);
+unsigned int Shader::CompileVertexShader(const std::string& code) const {
+    unsigned int shader = glCreateShader(GL_VERTEX_SHADER);
     const char* ccode = code.c_str();
     glShaderSource(shader, 1, &ccode, nullptr);
     glCompileShader(shader);
@@ -50,8 +50,8 @@ GLuint Shader::CompileVertexShader(const std::string& code) const {
     return shader;
 }
 
-GLuint Shader::CompileFragmentShader(const std::string& code) const {
-    GLuint shader = glCreateShader(GL_FRAGMENT_SHADER);
+unsigned int Shader::CompileFragmentShader(const std::string& code) const {
+    unsigned int shader = glCreateShader(GL_FRAGMENT_SHADER);
     const char* ccode = code.c_str();
     glShaderSource(shader, 1, &ccode, nullptr);
     glCompileShader(shader);
@@ -59,9 +59,9 @@ GLuint Shader::CompileFragmentShader(const std::string& code) const {
     return shader;
 }
 
-void Shader::CheckCompileErrors(GLuint shader, const std::string& type) const {
-    GLint success;
-    GLchar infoLog[1024];
+void Shader::CheckCompileErrors(unsigned int shader, const std::string& type) const {
+    int success;
+    char infoLog[1024];
     if (type != "PROGRAM") {
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         if (!success) {
@@ -87,14 +87,36 @@ unsigned int Shader::GetUniform(std::string name) const {
     return glGetUniformLocation(ID, name.c_str());
 }
 
+void Shader::SetFloat(std::string name, float value) const
+{
+    unsigned int loc = GetUniform(name);
+    glUniform1f(loc, value);
+}
+
 void Shader::SetVec3(std::string name, glm::vec3 value) const
 {
-    unsigned int loc=glGetUniformLocation(ID, name.c_str());
+    unsigned int loc = GetUniform(name);
     glUniform3fv(loc, 1, glm::value_ptr(value));
 }
 
 void Shader::SetMat4(std::string name, glm::mat4 value) const
 {
-    unsigned int loc = glGetUniformLocation(ID, name.c_str());
+    unsigned int loc = GetUniform(name);
     glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
+}
+
+void Shader::SetMaterial(Material value) const
+{
+     SetVec3("material.ambient", value.ambient);
+     SetVec3("material.diffuse", value.diffuse);
+     SetVec3("material.specular", value.specular);
+     SetFloat("material.shininess", value.shininess);
+}
+
+void Shader::SetLight(Light value) const
+{
+    SetVec3("light.position", value.position);
+    SetVec3("light.ambient", value.ambient);
+    SetVec3("light.diffuse", value.diffuse);
+    SetVec3("light.specular", value.specular);
 }

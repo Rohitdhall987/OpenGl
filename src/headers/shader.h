@@ -1,16 +1,17 @@
 #pragma once
 #include <GL/glew.h>
-#include <glm/gtc/type_ptr.hpp>
 #include <string>
+
+#include "types.h"
 
 class Shader {
 private:
-    GLuint ID;
+    unsigned int ID;
 
     std::string ReadFile(const std::string& path) const;
-    GLuint CompileVertexShader(const std::string& code) const;
-    GLuint CompileFragmentShader(const std::string& code) const;
-    void CheckCompileErrors(GLuint shader, const std::string& type) const;
+    unsigned int CompileVertexShader(const std::string& code) const;
+    unsigned int CompileFragmentShader(const std::string& code) const;
+    void CheckCompileErrors(unsigned int shader, const std::string& type) const;
 
 public:
     Shader(const std::string& vertexPath, const std::string& fragmentPath);
@@ -20,9 +21,12 @@ public:
 
     unsigned int GetUniform(std::string name) const;
 
+    void SetFloat(std::string name, float value) const;
     void SetVec3(std::string name, glm::vec3 value) const;
     void SetMat4(std::string name, glm::mat4 value) const;
+    void SetMaterial( Material value) const;
+    void SetLight( Light value) const;
 
-    GLuint GetID() const { return ID; }
+    unsigned int GetID() const { return ID; }
 };
 

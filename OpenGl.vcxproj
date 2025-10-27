@@ -145,6 +145,7 @@
     <ClInclude Include="src\headers\EBO.h" />
     <ClInclude Include="src\headers\shader.h" />
     <ClInclude Include="src\headers\texture.h" />
+    <ClInclude Include="src\headers\types.h" />
     <ClInclude Include="src\headers\VAO.h" />
     <ClInclude Include="src\headers\VBO.h" />
   </ItemGroup>

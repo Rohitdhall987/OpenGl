@@ -121,9 +121,9 @@ int main(void)
 
     cry_girl_t.Bind();
 
-    Shader shader("resources/shaders/vertex.glsl", "resources/shaders/frag.glsl");
+    Shader phong_shader("resources/shaders/vertex.glsl", "resources/shaders/frag.glsl");
 
-    Shader light_shader("resources/shaders/vertex.glsl", "resources/shaders/color.glsl");
+    Shader color_shader("resources/shaders/vertex.glsl", "resources/shaders/color.glsl");
 
     
 
@@ -145,6 +145,19 @@ int main(void)
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
 
+    glm::vec3 background(0.125f, 0.33f , 0.315f);
+    Material cube_material;
+    Light light_settings;
+
+    cube_material.ambient = glm::vec3(background);
+    cube_material.diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+    cube_material.specular = glm::vec3(0.5f, 0.5f, 0.5f);
+    cube_material.shininess = 32.0f;
+
+    light_settings.ambient = glm::vec3(background);
+    light_settings.diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+    light_settings.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
@@ -158,38 +171,37 @@ int main(void)
         camera.ProcessInput(window, deltaTime);
 
         
-         glClearColor(0.25f/2, 0.66f/2, 0.63f/2,1.0f);    
-        //glClearColor(0.035f, 0.035f, 0.035f, 1.0f);
+         //glClearColor(0.25f/2, 0.66f/2, 0.63f/2,1.0f);    
+        glClearColor(background.x, background.y, background.z, 1.0f);
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
         // --- CUBE RENDER ---
-        shader.Use();
-        shader.SetMat4("model", glm::mat4(1.0f));
-        shader.SetMat4("view", camera.GetView());
-        shader.SetMat4("projection", camera.GetProjection());
-
-        vao.Bind();
+        phong_shader.Use();
+        phong_shader.SetMat4("model", glm::mat4(1.0f));
+        phong_shader.SetMat4("view", camera.GetView());
+        phong_shader.SetMat4("projection", camera.GetProjection());
 
         glm::mat4 rotMat = glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
         glm::vec3 rotatedLightPos = glm::vec3(rotMat * glm::vec4(light_pos, 1.0f));
+        light_settings.position = rotatedLightPos;
 
-        shader.SetVec3("objectColor", glm::vec3(0.3f, 1.0f, 0.4f));
-        shader.SetVec3("lightPos", rotatedLightPos);
-        shader.SetVec3("lightColor", light_clr);
-        shader.SetVec3("viewPos", camera.cameraPos);
+        phong_shader.SetMaterial(cube_material);
+        phong_shader.SetLight(light_settings);
+        phong_shader.SetVec3("viewPos", camera.cameraPos);
 
+        vao.Bind();
         glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
 
         // --- LIGHT RENDER ---
-        light_shader.Use();
+        color_shader.Use();
         glm::mat4 model = glm::translate(glm::mat4(1.0f), rotatedLightPos);
         model = glm::scale(model, glm::vec3(0.2f));
-        light_shader.SetMat4("model", model);
-        light_shader.SetMat4("view", camera.GetView());
-        light_shader.SetMat4("projection", camera.GetProjection());
-        light_shader.SetVec3("objectColor", light_clr);
+        color_shader.SetMat4("model", model);
+        color_shader.SetMat4("view", camera.GetView());
+        color_shader.SetMat4("projection", camera.GetProjection());
+        color_shader.SetVec3("objectColor", light_clr);
         light.Bind();
         glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
 
