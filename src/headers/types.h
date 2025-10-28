@@ -13,7 +13,7 @@ struct Material {
 
 struct Light {
     glm::vec3 position;
-    //glm::vec3 direction;
+    glm::vec3 direction;
 
     glm::vec3 ambient;
     glm::vec3 diffuse;
@@ -22,4 +22,7 @@ struct Light {
     float constant;
     float linear;
     float quadratic;
+
+    float cutOff;
+    float outerCutOff;
 };

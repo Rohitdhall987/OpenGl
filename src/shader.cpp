@@ -125,7 +125,9 @@ void Shader::SetLight(Light value) const
     SetFloat("light.constant", value.constant);
     SetFloat("light.linear", value.linear);
     SetFloat("light.quadratic", value.quadratic);
-    //SetVec3("light.direction", value.direction);
+    SetFloat("light.cutOff", value.cutOff);
+    SetFloat("light.outerCutOff", value.outerCutOff);
+    SetVec3("light.direction", value.direction);
     SetVec3("light.ambient", value.ambient);
     SetVec3("light.diffuse", value.diffuse);
     SetVec3("light.specular", value.specular);

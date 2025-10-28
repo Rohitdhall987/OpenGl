@@ -178,6 +178,9 @@ int main(void)
     light_settings.linear = 0.09f;
     light_settings.quadratic = 0.032f;
 
+    light_settings.cutOff = glm::cos(glm::radians(10.0f));
+    light_settings.outerCutOff = glm::cos(glm::radians(17.5f));
+
     glActiveTexture(GL_TEXTURE0);
     cube_material.diffuseMap->Bind();
 
@@ -211,10 +214,10 @@ int main(void)
         
         glm::mat4 cube_model = glm::mat4(1.0f);
 
-        glm::mat4 rotMat = glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
-        glm::vec3 rotatedLightPos = glm::vec3(rotMat * glm::vec4(light_pos, 1.0f));
-        light_settings.position = rotatedLightPos;
-        //light_settings.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
+        /*glm::mat4 rotMat = glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::vec3 rotatedLightPos = glm::vec3(rotMat * glm::vec4(light_pos, 1.0f));*/
+        light_settings.position = camera.cameraPos;
+        light_settings.direction = camera.cameraFront;
 
         phong_shader.SetMat4("view", camera.GetView());
         phong_shader.SetMat4("projection", camera.GetProjection());
@@ -239,7 +242,7 @@ int main(void)
         }
 
         // --- LIGHT RENDER ---
-        color_shader.Use();
+        /*color_shader.Use();
 
         glm::mat4 light_model = glm::translate(glm::mat4(1.0f), rotatedLightPos);
         light_model = glm::scale(light_model, glm::vec3(0.2f));
@@ -248,7 +251,7 @@ int main(void)
         color_shader.SetMat4("projection", camera.GetProjection());
         color_shader.SetVec3("objectColor", light_clr);
         light.Bind();
-        glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);*/
 
 
         lastFrame = currentFrame;
