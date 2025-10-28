@@ -210,7 +210,8 @@ int main(void)
 
         glm::mat4 rotMat = glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
         glm::vec3 rotatedLightPos = glm::vec3(rotMat * glm::vec4(light_pos, 1.0f));
-        light_settings.position = rotatedLightPos;
+        //light_settings.position = rotatedLightPos;
+        light_settings.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
 
         phong_shader.SetMat4("view", camera.GetView());
         phong_shader.SetMat4("projection", camera.GetProjection());
