@@ -53,10 +53,10 @@ Texture::~Texture()
 
 void Texture::Bind() const
 {
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(GL_TEXTURE_2D, ID);
 };
 
 void Texture::Unbind() const
 {
-    glBindTexture(GL_TEXTURE_2D, ID);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }

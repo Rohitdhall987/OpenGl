@@ -1,12 +1,14 @@
 #pragma once
 #include <glm/gtc/type_ptr.hpp>
 
-struct Material {
+#include "texture.h"
 
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
+struct Material {
+    Texture* diffuseMap;   
+    Texture* specularMap;
+    Texture* emissionMap;
     float shininess;
+    float emissionStrength;
 };
 
 struct Light {

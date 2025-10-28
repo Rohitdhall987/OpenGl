@@ -63,6 +63,19 @@ unsigned int indices[] = {
    20,21,22,22,23,20
 };
 
+glm::vec3 cubePositions[10] = {
+    { -2.0f,  0.0f, -1.0f },
+    {  2.0f,  1.0f,  0.0f },
+    {  0.0f, -1.0f,  2.0f },
+    { -1.5f,  1.5f, -2.0f },
+    {  1.2f, -0.5f, -2.5f },
+    { -2.3f, -0.3f,  1.5f },
+    {  0.8f,  1.0f, -1.2f },
+    {  2.5f,  0.5f,  1.0f },
+    { -1.8f, -1.2f,  0.8f },
+    {  0.0f,  0.8f, -3.0f }
+};
+
 
 int main(void)
 {
@@ -117,9 +130,9 @@ int main(void)
     ebo.Unbind();
     // ----------------------------------------------------------------------
 
-    Texture cry_girl_t("resources/textures/crying_girl.png");
+    
 
-    cry_girl_t.Bind();
+    
 
     Shader phong_shader("resources/shaders/vertex.glsl", "resources/shaders/frag.glsl");
 
@@ -145,24 +158,37 @@ int main(void)
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
 
-    glm::vec3 background(0.125f, 0.33f , 0.315f);
+    glm::vec3 background(0.0125f, 0.033f , 0.0315f);
     Material cube_material;
     Light light_settings;
 
-    cube_material.ambient = glm::vec3(background);
-    cube_material.diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
-    cube_material.specular = glm::vec3(0.5f, 0.5f, 0.5f);
+    cube_material.diffuseMap = new Texture("resources/textures/brick.png");
+    cube_material.specularMap = new Texture("resources/textures/roughness.png");
+    cube_material.emissionMap = new Texture("resources/textures/crying_girl.png");
     cube_material.shininess = 32.0f;
+    cube_material.emissionStrength = 0.5f;
+
+    
 
     light_settings.ambient = glm::vec3(background);
     light_settings.diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
     light_settings.specular = glm::vec3(1.0f, 1.0f, 1.0f);
 
+
+    glActiveTexture(GL_TEXTURE0);
+    cube_material.diffuseMap->Bind();
+
+    glActiveTexture(GL_TEXTURE1);
+    cube_material.specularMap->Bind();
+
+    glActiveTexture(GL_TEXTURE2);
+    cube_material.emissionMap->Bind();
+
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
 
-        rotation += 50.0f * deltaTime;
+        //rotation += 50.0f * deltaTime;
 
         if (rotation >= 360) {
             rotation = 0.0f;
@@ -179,26 +205,41 @@ int main(void)
 
         // --- CUBE RENDER ---
         phong_shader.Use();
-        phong_shader.SetMat4("model", glm::mat4(1.0f));
-        phong_shader.SetMat4("view", camera.GetView());
-        phong_shader.SetMat4("projection", camera.GetProjection());
+        
+        glm::mat4 cube_model = glm::mat4(1.0f);
 
         glm::mat4 rotMat = glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
         glm::vec3 rotatedLightPos = glm::vec3(rotMat * glm::vec4(light_pos, 1.0f));
         light_settings.position = rotatedLightPos;
 
+        phong_shader.SetMat4("view", camera.GetView());
+        phong_shader.SetMat4("projection", camera.GetProjection());
         phong_shader.SetMaterial(cube_material);
         phong_shader.SetLight(light_settings);
         phong_shader.SetVec3("viewPos", camera.cameraPos);
 
         vao.Bind();
-        glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
+        for (int i = 0; i < 10; i++) {
+            glm::mat4 cube_model = glm::mat4(1.0f);
+
+            // translate each cube
+            cube_model = glm::translate(cube_model, cubePositions[i]);
+
+            // rotate each cube differently (based on index + time)
+            float angle = rotation + i * 36.0f; // unique rotation per cube
+            cube_model = glm::rotate(cube_model, glm::radians(angle),
+                glm::vec3(0.3f * i, 1.0f, 0.5f * i));
+
+            phong_shader.SetMat4("model", cube_model);
+            glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
+        }
 
         // --- LIGHT RENDER ---
         color_shader.Use();
-        glm::mat4 model = glm::translate(glm::mat4(1.0f), rotatedLightPos);
-        model = glm::scale(model, glm::vec3(0.2f));
-        color_shader.SetMat4("model", model);
+
+        glm::mat4 light_model = glm::translate(glm::mat4(1.0f), rotatedLightPos);
+        light_model = glm::scale(light_model, glm::vec3(0.2f));
+        color_shader.SetMat4("model", light_model);
         color_shader.SetMat4("view", camera.GetView());
         color_shader.SetMat4("projection", camera.GetProjection());
         color_shader.SetVec3("objectColor", light_clr);

@@ -1,11 +1,12 @@
 #version 330 core
 
 struct Material {
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-    float shininess;
-};
+    sampler2D diffuse;
+    sampler2D specular;
+    sampler2D emission;
+    float     shininess;
+    float     emissionStrength;
+}; 
 
 struct Light {
     vec3 position;
@@ -22,7 +23,6 @@ in vec2 TextureCoord;
 uniform Material material;
 uniform Light light;  
 uniform vec3 viewPos;
-uniform sampler2D ourTexture;
 
 out vec4 FragColor;
 
@@ -38,12 +38,15 @@ void main()
 
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 
-    vec3 ambient  = light.ambient * material.ambient;
-    vec3 diffuse  = light.diffuse * (diff * material.diffuse);
-    vec3 specular = light.specular * (spec * material.specular);  
+    vec4 emissionTex = texture(material.emission.r, TextureCoord);
+    vec3 emission = material.emissionStrength * emissionTex.rgb * step(0.1, emissionTex.a);
 
-    vec4 t =texture(ourTexture,TextureCoord);
-    
-    vec3 result = (ambient + diffuse +specular) * mix(vec3(1.0),t.rgb,t.a);
+    vec3 ambient  = light.ambient * vec3(texture(material.diffuse,TextureCoord));
+    vec3 diffuse  = light.diffuse  * diff * vec3(texture(material.diffuse, TextureCoord));  
+    vec3 specular = light.specular * spec *  vec3(texture(material.specular, TextureCoord));
+
+    vec3 result = (ambient + diffuse +specular + emission) ;
+
+
     FragColor =  vec4(result, 1.0);
 } 

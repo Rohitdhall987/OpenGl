@@ -93,6 +93,12 @@ void Shader::SetFloat(std::string name, float value) const
     glUniform1f(loc, value);
 }
 
+void Shader::SetInt(std::string name, int value) const
+{
+    unsigned int loc = GetUniform(name);
+    glUniform1i(loc, value);
+}
+
 void Shader::SetVec3(std::string name, glm::vec3 value) const
 {
     unsigned int loc = GetUniform(name);
@@ -105,12 +111,12 @@ void Shader::SetMat4(std::string name, glm::mat4 value) const
     glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
 }
 
-void Shader::SetMaterial(Material value) const
-{
-     SetVec3("material.ambient", value.ambient);
-     SetVec3("material.diffuse", value.diffuse);
-     SetVec3("material.specular", value.specular);
-     SetFloat("material.shininess", value.shininess);
+void Shader::SetMaterial(Material value) const {
+    SetInt("material.diffuse", 0);
+    SetInt("material.specular", 1);
+    SetInt("material.emission", 2);
+    SetFloat("material.shininess", value.shininess);
+    SetFloat("material.emissionStrength", value.emissionStrength);
 }
 
 void Shader::SetLight(Light value) const
