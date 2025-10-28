@@ -174,6 +174,9 @@ int main(void)
     light_settings.diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
     light_settings.specular = glm::vec3(1.0f, 1.0f, 1.0f);
 
+    light_settings.constant = 1.0f;
+    light_settings.linear = 0.09f;
+    light_settings.quadratic = 0.032f;
 
     glActiveTexture(GL_TEXTURE0);
     cube_material.diffuseMap->Bind();
@@ -181,8 +184,8 @@ int main(void)
     glActiveTexture(GL_TEXTURE1);
     cube_material.specularMap->Bind();
 
-    glActiveTexture(GL_TEXTURE2);
-    cube_material.emissionMap->Bind();
+    /*glActiveTexture(GL_TEXTURE2);
+    cube_material.emissionMap->Bind();*/
 
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = glfwGetTime();
@@ -210,8 +213,8 @@ int main(void)
 
         glm::mat4 rotMat = glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
         glm::vec3 rotatedLightPos = glm::vec3(rotMat * glm::vec4(light_pos, 1.0f));
-        //light_settings.position = rotatedLightPos;
-        light_settings.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
+        light_settings.position = rotatedLightPos;
+        //light_settings.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
 
         phong_shader.SetMat4("view", camera.GetView());
         phong_shader.SetMat4("projection", camera.GetProjection());

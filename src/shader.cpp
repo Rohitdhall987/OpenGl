@@ -121,8 +121,11 @@ void Shader::SetMaterial(Material value) const {
 
 void Shader::SetLight(Light value) const
 {
-    //SetVec3("light.position", value.position);
-    SetVec3("light.direction", value.direction);
+    SetVec3("light.position", value.position);
+    SetFloat("light.constant", value.constant);
+    SetFloat("light.linear", value.linear);
+    SetFloat("light.quadratic", value.quadratic);
+    //SetVec3("light.direction", value.direction);
     SetVec3("light.ambient", value.ambient);
     SetVec3("light.diffuse", value.diffuse);
     SetVec3("light.specular", value.specular);
