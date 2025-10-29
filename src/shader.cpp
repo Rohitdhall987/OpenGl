@@ -119,16 +119,21 @@ void Shader::SetMaterial(Material value) const {
     SetFloat("material.emissionStrength", value.emissionStrength);
 }
 
-void Shader::SetLight(Light value) const
+void Shader::SetPointLight(PointLight value, int index) const
 {
-    SetVec3("light.position", value.position);
-    SetFloat("light.constant", value.constant);
-    SetFloat("light.linear", value.linear);
-    SetFloat("light.quadratic", value.quadratic);
-    SetFloat("light.cutOff", value.cutOff);
-    SetFloat("light.outerCutOff", value.outerCutOff);
-    SetVec3("light.direction", value.direction);
-    SetVec3("light.ambient", value.ambient);
-    SetVec3("light.diffuse", value.diffuse);
-    SetVec3("light.specular", value.specular);
+    SetFloat("pointLights[" + std::to_string(index) + "].constant",value.constant);
+    SetFloat("pointLights[" + std::to_string(index) + "].linear", value.linear);
+    SetFloat("pointLights[" + std::to_string(index) + "].quadratic", value.quadratic);
+    SetVec3("pointLights[" + std::to_string(index) + "].position", value.position);
+    SetVec3("pointLights[" + std::to_string(index) + "].ambient", value.ambient);
+    SetVec3("pointLights[" + std::to_string(index) + "].specular", value.specular);
+    SetVec3("pointLights[" + std::to_string(index) + "].diffuse", value.diffuse);
+}
+
+void Shader::SetDirectionLight(DirLight value) const
+{
+    SetVec3("dirLight.direction", value.direction);
+    SetVec3("dirLight.ambient", value.ambient);
+    SetVec3("dirLight.specular", value.specular);
+    SetVec3("dirLight.diffuse", value.diffuse);
 }

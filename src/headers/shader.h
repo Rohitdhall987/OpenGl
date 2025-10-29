@@ -26,7 +26,8 @@ public:
     void SetVec3(std::string name, glm::vec3 value) const;
     void SetMat4(std::string name, glm::mat4 value) const;
     void SetMaterial( Material value) const;
-    void SetLight( Light value) const;
+    void SetPointLight( PointLight value , int index) const;
+    void SetDirectionLight(DirLight value) const;
 
     unsigned int GetID() const { return ID; }
 };

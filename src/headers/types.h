@@ -11,18 +11,22 @@ struct Material {
     float emissionStrength;
 };
 
-struct Light {
-    glm::vec3 position;
+struct DirLight {
     glm::vec3 direction;
 
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
+};
+
+struct PointLight {
+    glm::vec3 position;
 
     float constant;
     float linear;
     float quadratic;
 
-    float cutOff;
-    float outerCutOff;
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
 };

@@ -76,6 +76,20 @@ glm::vec3 cubePositions[10] = {
     {  0.0f,  0.8f, -3.0f }
 };
 
+glm::vec3 pointLightPositions[] = {
+    glm::vec3(0.7f,  0.2f,  2.0f),
+    glm::vec3(0.3f, -1.3f, -4.0f),
+    glm::vec3(-1.0f,  2.0f, -1.0f),
+    glm::vec3(0.0f,  0.0f, -3.0f)
+};
+
+glm::vec3 pointLightColor[] = {
+    glm::vec3((float)239/255, (float)45/255, (float)86/255),
+    glm::vec3((float)237 /255, (float)125 /255, (float)58 /255),
+    glm::vec3((float)140 /255,(float)216 /255,(float)103 /255),
+    glm::vec3((float)47 /255, (float)191 /255,  (float)113 /255),
+};
+
 
 int main(void)
 {
@@ -113,9 +127,6 @@ int main(void)
     // ----------------------------------------------------------------------
     // LIGHT (VAO) SETUP 
     // ----------------------------------------------------------------------
-
-    glm::vec3 light_pos = glm::vec3(1.2f, 1.2f, 0.2f);
-    glm::vec3 light_clr = glm::vec3(1.0f, 1.0f, 1.0f);
 
     VAO light;
     light.Bind();
@@ -158,9 +169,10 @@ int main(void)
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
 
-    glm::vec3 background(0.0125f, 0.033f , 0.0315f);
+    glm::vec3 background(0.125f/4, 0.33f/4 , 0.315f/4);
     Material cube_material;
-    Light light_settings;
+    DirLight dir_light;
+    PointLight point_light;
 
     cube_material.diffuseMap = new Texture("resources/textures/brick.png");
     cube_material.specularMap = new Texture("resources/textures/roughness.png");
@@ -170,16 +182,28 @@ int main(void)
 
     
 
-    light_settings.ambient = glm::vec3(background);
-    light_settings.diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
-    light_settings.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+    dir_light.ambient = glm::vec3(background);
+    dir_light.diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+    dir_light.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+    dir_light.direction = glm::vec3(-0.3f, -0.8f, -0.6f);
 
-    light_settings.constant = 1.0f;
-    light_settings.linear = 0.09f;
-    light_settings.quadratic = 0.032f;
+    phong_shader.Use();
+    phong_shader.SetMaterial(cube_material);
+    phong_shader.SetDirectionLight(dir_light);
 
-    light_settings.cutOff = glm::cos(glm::radians(10.0f));
-    light_settings.outerCutOff = glm::cos(glm::radians(17.5f));
+    for (int i = 0; i < 4; i++) {
+        point_light.constant = 1.0f;
+        point_light.linear = 0.09f;
+        point_light.quadratic = 0.032f;
+
+        point_light.ambient = glm::vec3(background);
+        point_light.diffuse = pointLightColor[i];
+        point_light.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+        point_light.position = pointLightPositions[i];
+        phong_shader.SetPointLight(point_light,i);
+    }
+
+
 
     glActiveTexture(GL_TEXTURE0);
     cube_material.diffuseMap->Bind();
@@ -194,7 +218,7 @@ int main(void)
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
 
-        //rotation += 50.0f * deltaTime;
+        rotation += 50.0f * deltaTime;
 
         if (rotation >= 360) {
             rotation = 0.0f;
@@ -213,16 +237,8 @@ int main(void)
         phong_shader.Use();
         
         glm::mat4 cube_model = glm::mat4(1.0f);
-
-        /*glm::mat4 rotMat = glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
-        glm::vec3 rotatedLightPos = glm::vec3(rotMat * glm::vec4(light_pos, 1.0f));*/
-        light_settings.position = camera.cameraPos;
-        light_settings.direction = camera.cameraFront;
-
         phong_shader.SetMat4("view", camera.GetView());
         phong_shader.SetMat4("projection", camera.GetProjection());
-        phong_shader.SetMaterial(cube_material);
-        phong_shader.SetLight(light_settings);
         phong_shader.SetVec3("viewPos", camera.cameraPos);
 
         vao.Bind();
@@ -232,7 +248,6 @@ int main(void)
             // translate each cube
             cube_model = glm::translate(cube_model, cubePositions[i]);
 
-            // rotate each cube differently (based on index + time)
             float angle = rotation + i * 36.0f; // unique rotation per cube
             cube_model = glm::rotate(cube_model, glm::radians(angle),
                 glm::vec3(0.3f * i, 1.0f, 0.5f * i));
@@ -242,16 +257,18 @@ int main(void)
         }
 
         // --- LIGHT RENDER ---
-        /*color_shader.Use();
+        color_shader.Use();
 
-        glm::mat4 light_model = glm::translate(glm::mat4(1.0f), rotatedLightPos);
-        light_model = glm::scale(light_model, glm::vec3(0.2f));
-        color_shader.SetMat4("model", light_model);
-        color_shader.SetMat4("view", camera.GetView());
-        color_shader.SetMat4("projection", camera.GetProjection());
-        color_shader.SetVec3("objectColor", light_clr);
-        light.Bind();
-        glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);*/
+        for (int i = 0; i < 4; i++) {
+            glm::mat4 light_model = glm::translate(glm::mat4(1.0f), pointLightPositions[i]);
+            light_model = glm::scale(light_model, glm::vec3(0.2f));
+            color_shader.SetMat4("model", light_model);
+            color_shader.SetMat4("view", camera.GetView());
+            color_shader.SetMat4("projection", camera.GetProjection());
+            color_shader.SetVec3("objectColor", pointLightColor[i]);
+            light.Bind();
+            glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
+        }
 
 
         lastFrame = currentFrame;
