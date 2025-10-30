@@ -112,16 +112,16 @@ void Shader::SetMat4(std::string name, glm::mat4 value) const
 }
 
 void Shader::SetMaterial(Material value) const {
-    SetInt("material.diffuse", 0);
-    SetInt("material.specular", 1);
-    SetInt("material.emission", 2);
+    //SetInt("material.diffuse", 0);
+    //SetInt("material.specular", 1);
+    //SetInt("material.emission", 2);
     SetFloat("material.shininess", value.shininess);
     SetFloat("material.emissionStrength", value.emissionStrength);
 }
 
 void Shader::SetPointLight(PointLight value, int index) const
 {
-    SetFloat("pointLights[" + std::to_string(index) + "].constant",value.constant);
+    SetFloat("pointLights[" + std::to_string(index) + "].constant", value.constant);
     SetFloat("pointLights[" + std::to_string(index) + "].linear", value.linear);
     SetFloat("pointLights[" + std::to_string(index) + "].quadratic", value.quadratic);
     SetVec3("pointLights[" + std::to_string(index) + "].position", value.position);
