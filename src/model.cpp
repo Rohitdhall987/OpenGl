@@ -1,5 +1,13 @@
 #include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
 #include <stb/stb_image.h>
+
+#ifdef _WIN32
+#include <windows.h>   
+#endif
+
 #include "headers/model.h"
 
 Model::Model(const std::string& path) {
@@ -13,7 +21,9 @@ void Model::Draw(const Shader& shader) const {
 
 void Model::loadModel(const std::string& path) {
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
+    //const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
+    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenNormals);
+
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         std::cerr << "ASSIMP ERROR: " << importer.GetErrorString() << "\n";
         return;
@@ -55,8 +65,8 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 
     if (mesh->mMaterialIndex >= 0) {
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-        auto diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-        auto specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+        auto diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "diffuse");
+        auto specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "specular");
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
     }
@@ -65,11 +75,19 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 }
 
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::string& typeName) {
+
+    std::cout << "Loading texture\n";
+
     std::vector<Texture> textures;
     for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
+
+        std::cout << "inside loop " << i << std::endl;
+
         aiString str;
         mat->GetTexture(type, i, &str);
         std::string filename = directory + "/" + str.C_Str();
+
+        std::cout << "Finding file " << filename << std::endl;
 
         bool skip = false;
         for (const auto& tex : loaded_textures) {
@@ -94,10 +112,35 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
 unsigned int Model::TextureFromFile(const char* path) {
     int w, h, comp;
     stbi_set_flip_vertically_on_load(true);
+
+#ifdef _WIN32
+    // Convert UTF-8 to UTF-16 for Windows file system
+    int size_needed = MultiByteToWideChar(CP_UTF8, 0, path, -1, nullptr, 0);
+    std::wstring wpath(size_needed, 0);
+    MultiByteToWideChar(CP_UTF8, 0, path, -1, &wpath[0], size_needed);
+
+
+    std::ifstream file(wpath, std::ios::binary);
+    if (!file) {
+        std::wcerr << L"[TextureFromFile] Cannot open: " << wpath << std::endl;
+        return 0;
+    }
+
+
+    std::vector<unsigned char> buffer((std::istreambuf_iterator<char>(file)), {});
+    file.close();
+
+    unsigned char* data = stbi_load_from_memory(buffer.data(), buffer.size(), &w, &h, &comp, 0);
+#else
     unsigned char* data = stbi_load(path, &w, &h, &comp, 0);
+#endif
+
     if (!data) {
         std::cerr << "Texture load failed: " << path << std::endl;
         return 0;
+    }
+    else {
+        std::cout << "Texture loaded successfully: " << path << std::endl;
     }
 
     GLenum format = (comp == 1) ? GL_RED : (comp == 3 ? GL_RGB : GL_RGBA);
@@ -109,6 +152,7 @@ unsigned int Model::TextureFromFile(const char* path) {
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
     stbi_image_free(data);
     return texID;
 }

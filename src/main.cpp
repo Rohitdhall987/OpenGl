@@ -40,7 +40,7 @@ int main(void)
     Shader color_shader("resources/shaders/vertex.glsl", "resources/shaders/color.glsl");
 
    
-    glm::vec3 background(0.125f / 4, 0.33f / 4, 0.315f / 4);
+    glm::vec3 background(0.53f, 0.81f, 0.92f);
     Material cube_material;
     DirLight dir_light;
 
@@ -48,7 +48,7 @@ int main(void)
     cube_material.shininess = 32.0f;
     cube_material.emissionStrength = 0.5f;
 
-    dir_light.ambient = glm::vec3(background);
+    dir_light.ambient = glm::vec3(background.x/2,background.y/2,background.z/2);
     dir_light.diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
     dir_light.specular = glm::vec3(1.0f, 1.0f, 1.0f);
     dir_light.direction = glm::vec3(-0.3f, -0.8f, -0.6f);
@@ -60,10 +60,10 @@ int main(void)
 
 
 
-    Model loaded_model("resources/model/monkey.obj");
+    Model loaded_model("resources/model/genshin/childe.pmx");
 
 
-    float deltaTime = 0.0f, lastFrame = 0.0f, rotation = 0.0f;
+    float deltaTime = 0.0f, lastFrame = 0.0f;
 
     while (!glfwWindowShouldClose(window))
     {
@@ -71,8 +71,7 @@ int main(void)
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        rotation += 50.0f * deltaTime;
-        if (rotation >= 360.0f) rotation = 0.0f;
+
 
         camera.ProcessInput(window, deltaTime);
 
@@ -86,7 +85,7 @@ int main(void)
 
 
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::scale(model,glm::vec3(0.1f));
         phong_shader.SetMat4("model", model);
 
 
