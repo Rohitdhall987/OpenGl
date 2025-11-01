@@ -26,4 +26,7 @@ public:
     void MouseMovement(double xpos, double ypos);
 
     void ScrollInput(double xoffset, double yoffset);
+
+    void ResetMouse(double xpos, double ypos);
+
 };

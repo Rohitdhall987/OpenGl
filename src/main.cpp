@@ -1,8 +1,13 @@
-﻿#include <GL/glew.h>
+﻿
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 #include "headers/callback.h"
 #include "headers/shader.h"
@@ -16,10 +21,18 @@ int main(void)
 
     glfwSetErrorCallback(Callback::errCallBack);
 
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     GLFWwindow* window = glfwCreateWindow(800, 800, "LEARN OPENGL", NULL, NULL);
     glfwMakeContextCurrent(window);
 
     glewInit();
+
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
@@ -31,10 +44,12 @@ int main(void)
     glfwSwapInterval(1);
     glfwSetFramebufferSizeCallback(window, Callback::frameSizeCallBack);
     glfwSetCursorPosCallback(window, Callback::MouseCallback);
+    glfwSetMouseButtonCallback(window, Callback::MouseButtonCallback);
     glfwSetScrollCallback(window, Callback::ScrollCallback);
     glfwSetKeyCallback(window, Callback::KeyCallback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init();
     
     Shader phong_shader("resources/shaders/vertex.glsl", "resources/shaders/frag.glsl");
     Shader color_shader("resources/shaders/vertex.glsl", "resources/shaders/color.glsl");
@@ -67,11 +82,14 @@ int main(void)
 
     while (!glfwWindowShouldClose(window))
     {
-        float currentFrame = glfwGetTime();
+        double currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        ImGui::ShowDemoWindow();
 
         camera.ProcessInput(window, deltaTime);
 
@@ -91,9 +109,17 @@ int main(void)
 
         loaded_model.Draw(phong_shader);
 
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
     glfwTerminate();
     return 0;

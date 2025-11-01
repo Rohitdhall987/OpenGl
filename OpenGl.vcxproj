@@ -76,7 +76,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;GLEW_STATIC;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)libraries\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libraries\include;$(SolutionDir)libraries\include\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -93,7 +93,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;GLEW_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)libraries\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libraries\include;$(SolutionDir)libraries\include\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -129,6 +129,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="libraries\include\imgui\imgui.cpp" />
+    <ClCompile Include="libraries\include\imgui\imgui_demo.cpp" />
+    <ClCompile Include="libraries\include\imgui\imgui_draw.cpp" />
+    <ClCompile Include="libraries\include\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="libraries\include\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="libraries\include\imgui\imgui_tables.cpp" />
+    <ClCompile Include="libraries\include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\mesh.cpp" />
     <ClCompile Include="src\model.cpp" />
@@ -138,6 +145,15 @@
     <ClCompile Include="src\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="libraries\include\imgui\imconfig.h" />
+    <ClInclude Include="libraries\include\imgui\imgui.h" />
+    <ClInclude Include="libraries\include\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="libraries\include\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="libraries\include\imgui\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="libraries\include\imgui\imgui_internal.h" />
+    <ClInclude Include="libraries\include\imgui\imstb_rectpack.h" />
+    <ClInclude Include="libraries\include\imgui\imstb_textedit.h" />
+    <ClInclude Include="libraries\include\imgui\imstb_truetype.h" />
     <ClInclude Include="libraries\include\stb\stb_image.h" />
     <ClInclude Include="src\headers\callback.h" />
     <ClInclude Include="src\headers\camera.h" />

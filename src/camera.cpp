@@ -34,12 +34,12 @@ void Camera::MouseMovement(double xpos, double ypos) {
         firstMouse = false;
     }
 
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; 
+    double xoffset = xpos - lastX;
+    double yoffset = lastY - ypos;
     lastX = xpos;
     lastY = ypos;
 
-    const float sensitivity = 0.1f;
+    const double sensitivity = 0.1f;
     xoffset *= sensitivity;
     yoffset *= sensitivity;
 
@@ -63,6 +63,13 @@ void Camera::ScrollInput(double xoffset, double yoffset)
         fov = 1.0f;
     if (fov > 45.0f)
         fov = 45.0f;
+}
+
+void Camera::ResetMouse(double xpos, double ypos)
+{
+    lastX = xpos;
+    lastY = ypos;
+    firstMouse = true;
 }
 
 
