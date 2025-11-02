@@ -31,8 +31,7 @@ int main(void)
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-
+    ImGui::StyleColorsDark();
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);

@@ -1,4 +1,5 @@
 #include "headers/camera.h"
+#include <imgui.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <cmath>
 
@@ -12,6 +13,10 @@ glm::mat4 Camera::GetProjection() const
 }
 
 void Camera::ProcessInput(GLFWwindow* window, float deltaTime) {
+    ImGuiIO& io = ImGui::GetIO();
+    if (io.WantCaptureKeyboard)
+        return;
+
     float cameraSpeed = 2.5f * deltaTime;
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         cameraSpeed *= 2;

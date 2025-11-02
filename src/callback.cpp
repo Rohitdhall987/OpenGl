@@ -1,10 +1,12 @@
 #include "headers/callback.h"
 #include <GL/glew.h>
+#include <imgui.h>
 #include <iostream>
 
 #include "headers/camera.h"
 
 bool Callback::middleMousePressed = false;
+
 
 void Callback::frameSizeCallBack(GLFWwindow* window, int width, int height)
 {
@@ -17,6 +19,11 @@ void Callback::errCallBack(int error_code, const char* description)
 }
 
 void Callback::MouseCallback(GLFWwindow* window, double xpos, double ypos) {
+     ImGuiIO& io = ImGui::GetIO();
+
+    if (io.WantCaptureMouse)
+        return;
+
     if (!middleMousePressed)
         return;
 
@@ -27,6 +34,9 @@ void Callback::MouseCallback(GLFWwindow* window, double xpos, double ypos) {
 
 void Callback::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
+     ImGuiIO& io = ImGui::GetIO();
+    if (io.WantCaptureMouse)
+        return;
     Camera* cam = static_cast<Camera*>(glfwGetWindowUserPointer(window));
     if (cam)
         cam->ScrollInput(xoffset, yoffset);
@@ -34,6 +44,10 @@ void Callback::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset
 
 void Callback::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+     ImGuiIO& io = ImGui::GetIO();
+    if (io.WantCaptureKeyboard)
+        return;
+
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)glfwSetWindowShouldClose(window,true);
 }
 
