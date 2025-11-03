@@ -7,9 +7,9 @@ glm::mat4 Camera::GetView() const {
     return glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 }
 
-glm::mat4 Camera::GetProjection() const
+glm::mat4 Camera::GetProjection(int width, int height) const
 {
-    return glm::perspective(glm::radians(fov), 1.0f, 0.1f, 100.0f);
+    return glm::perspective(glm::radians(fov),(float) width/height, 0.1f, 100.0f);
 }
 
 void Camera::ProcessInput(GLFWwindow* window, float deltaTime) {

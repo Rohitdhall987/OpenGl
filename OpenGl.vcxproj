@@ -137,12 +137,14 @@
     <ClCompile Include="libraries\include\imgui\imgui_tables.cpp" />
     <ClCompile Include="libraries\include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\camera.cpp" />
+    <ClCompile Include="src\imgui_setup.cpp" />
     <ClCompile Include="src\mesh.cpp" />
     <ClCompile Include="src\model.cpp" />
     <ClCompile Include="src\shader.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\callback.cpp" />
     <ClCompile Include="src\stb_image.cpp" />
+    <ClCompile Include="src\util\windows_utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libraries\include\imgui\imconfig.h" />
@@ -157,10 +159,12 @@
     <ClInclude Include="libraries\include\stb\stb_image.h" />
     <ClInclude Include="src\headers\callback.h" />
     <ClInclude Include="src\headers\camera.h" />
+    <ClInclude Include="src\headers\imgui_setup.h" />
     <ClInclude Include="src\headers\mesh.h" />
     <ClInclude Include="src\headers\model.h" />
     <ClInclude Include="src\headers\shader.h" />
     <ClInclude Include="src\headers\types.h" />
+    <ClInclude Include="src\headers\utils\windoes_utils.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\color.glsl" />

@@ -4,11 +4,8 @@
 #include <string>
 #include <stb/stb_image.h>
 
-#ifdef _WIN32
-#include <windows.h>   
-#endif
-
 #include "headers/model.h"
+#include "headers/utils/windoes_utils.h"
 
 Model::Model(const std::string& path) {
     loadModel(path);
@@ -29,7 +26,7 @@ void Model::loadModel(const std::string& path) {
         return;
     }
 
-    directory = path.substr(0, path.find_last_of('/'));
+    directory = path.substr(0, path.find_last_of("/\\"));
     processNode(scene->mRootNode, scene);
 }
 
@@ -85,9 +82,39 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
 
         aiString str;
         mat->GetTexture(type, i, &str);
-        std::string filename = directory + "/" + str.C_Str();
+
+        std::cout << "Raw bytes (" << str.length << "): ";
+        for (unsigned int b = 0; b < str.length; ++b)
+            printf("%02X ", (unsigned char)str.C_Str()[b]);
+        std::cout << std::endl;
+
+
+        std::string texName = std::string(str.C_Str());
+
+
+        std::string filename = directory + "/" + texName;
+        std::replace(filename.begin(), filename.end(), '\\', '/');
+
 
         std::cout << "Finding file " << filename << std::endl;
+
+#ifdef _WIN32
+        // Convert UTF-8 path to UTF-16 for Windows
+        int wlen = MultiByteToWideChar(CP_UTF8, 0, filename.c_str(), -1, nullptr, 0);
+        std::wstring wfilename(wlen, 0);
+        MultiByteToWideChar(CP_UTF8, 0, filename.c_str(), -1, &wfilename[0], wlen);
+
+        // Use wide version to check existence
+        std::ifstream f(wfilename, std::ios::binary);
+#else
+        std::ifstream f(filename, std::ios::binary);
+#endif
+
+        if (!f) {
+            std::cerr << "!!! Missing texture: " << filename << std::endl;
+            continue;
+        }
+
 
         bool skip = false;
         for (const auto& tex : loaded_textures) {

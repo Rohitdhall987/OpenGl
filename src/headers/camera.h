@@ -20,7 +20,7 @@ public:
 
 public:
     glm::mat4 GetView() const;
-    glm::mat4 GetProjection() const;
+    glm::mat4 GetProjection(int width, int height) const;
     void ProcessInput(GLFWwindow* window, float deltaTime);
 
     void MouseMovement(double xpos, double ypos);

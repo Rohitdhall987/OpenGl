@@ -5,15 +5,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
-
 #include "headers/callback.h"
 #include "headers/shader.h"
 #include "headers/camera.h"
-#include "headers/mesh.h"
-#include "headers/model.h"
+
+#include "headers/imgui_setup.h"
 
 int main(void)
 {
@@ -23,15 +19,13 @@ int main(void)
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    GLFWwindow* window = glfwCreateWindow(800, 800, "LEARN OPENGL", NULL, NULL);
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+    GLFWwindow* window = glfwCreateWindow(mode->width, mode->height, "LEARN OPENGL", monitor, NULL);
     glfwMakeContextCurrent(window);
 
     glewInit();
 
-
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGui::StyleColorsDark();
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
@@ -47,34 +41,15 @@ int main(void)
     glfwSetScrollCallback(window, Callback::ScrollCallback);
     glfwSetKeyCallback(window, Callback::KeyCallback);
 
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init();
+    MyImgui gui(window);
     
     Shader phong_shader("resources/shaders/vertex.glsl", "resources/shaders/frag.glsl");
     Shader color_shader("resources/shaders/vertex.glsl", "resources/shaders/color.glsl");
 
    
-    glm::vec3 background(0.53f, 0.81f, 0.92f);
     Material cube_material;
     DirLight dir_light;
 
-
-    cube_material.shininess = 32.0f;
-    cube_material.emissionStrength = 0.5f;
-
-    dir_light.ambient = glm::vec3(background.x/2,background.y/2,background.z/2);
-    dir_light.diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
-    dir_light.specular = glm::vec3(1.0f, 1.0f, 1.0f);
-    dir_light.direction = glm::vec3(-0.3f, -0.8f, -0.6f);
-
-    phong_shader.Use();
-    phong_shader.SetMaterial(cube_material);
-    phong_shader.SetDirectionLight(dir_light);
-
-
-
-
-    Model loaded_model("resources/model/genshin/childe.pmx");
 
 
     float deltaTime = 0.0f, lastFrame = 0.0f;
@@ -85,19 +60,28 @@ int main(void)
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-        ImGui::ShowDemoWindow();
+
+        cube_material.shininess = gui.shine;
+        cube_material.emissionStrength = 0.5f;
+
+        dir_light.ambient = glm::vec3(gui.amb_col[0], gui.amb_col[1], gui.amb_col[2]);
+        dir_light.diffuse = glm::vec3(gui.light_col[0], gui.light_col[1], gui.light_col[2]);
+        dir_light.specular = glm::vec3(gui.light_spe, gui.light_spe, gui.light_spe);
+        dir_light.direction = glm::vec3(gui.light_dir[0], gui.light_dir[1], gui.light_dir[2]);
+
+        phong_shader.Use();
+        phong_shader.SetMaterial(cube_material);
+        phong_shader.SetDirectionLight(dir_light);
+        
 
         camera.ProcessInput(window, deltaTime);
 
-        glClearColor(background.x, background.y, background.z, 1.0f);
+        glClearColor(gui.bg_col[0],gui.bg_col[1],gui.bg_col[2], gui.bg_col[3]);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         phong_shader.Use();
         phong_shader.SetMat4("view", camera.GetView());
-        phong_shader.SetMat4("projection", camera.GetProjection());
+        phong_shader.SetMat4("projection", camera.GetProjection(mode->width,mode->height));
         phong_shader.SetVec3("viewPos", camera.cameraPos);
 
 
@@ -105,20 +89,16 @@ int main(void)
         model = glm::scale(model,glm::vec3(0.1f));
         phong_shader.SetMat4("model", model);
 
+        gui.Render_Model(phong_shader);
 
-        loaded_model.Draw(phong_shader);
-
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        gui.Render();
 
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+    gui.ShutDown();
 
     glfwTerminate();
     return 0;

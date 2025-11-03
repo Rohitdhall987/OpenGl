@@ -8,6 +8,7 @@
 
 class Model {
 public:
+    Model() = default;
     explicit Model(const std::string& path);
     void Draw(const Shader& shader) const;
 
