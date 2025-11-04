@@ -19,6 +19,8 @@ public:
 	float amb_col[3] = { 0.15625f, 0.15625f, 0.15625f };
 	float light_dir[3] = { -0.3f, -0.8f, -0.6f };
 	float light_col[3] = { 1.0f, 1.0f, 1.0f };
+	float outline_col[3] = { 1.0f, 1.0f, 1.0f };
 	float light_spe = 1.0f;
-	float shine = 32.0;
+	float shine = 32.0f;
+	float thickness = 0.02f;
 };

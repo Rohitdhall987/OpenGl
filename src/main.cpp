@@ -19,6 +19,7 @@ int main(void)
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+
     GLFWmonitor* monitor = glfwGetPrimaryMonitor();
     const GLFWvidmode* mode = glfwGetVideoMode(monitor);
     GLFWwindow* window = glfwCreateWindow(mode->width, mode->height, "LEARN OPENGL", monitor, NULL);
@@ -26,12 +27,9 @@ int main(void)
 
     glewInit();
 
-
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_STENCIL_TEST);
 
-    
     Camera camera;
     glfwSetWindowUserPointer(window, &camera);
     glfwSwapInterval(1);
@@ -44,22 +42,26 @@ int main(void)
     MyImgui gui(window);
     
     Shader phong_shader("resources/shaders/vertex.glsl", "resources/shaders/frag.glsl");
-    Shader color_shader("resources/shaders/vertex.glsl", "resources/shaders/color.glsl");
-
+    Shader outline_shader("resources/shaders/outline_vertex.glsl", "resources/shaders/color.glsl");
    
     Material cube_material;
     DirLight dir_light;
-
-
 
     float deltaTime = 0.0f, lastFrame = 0.0f;
 
     while (!glfwWindowShouldClose(window))
     {
+        glEnable(GL_DEPTH_TEST);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
         double currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+        camera.ProcessInput(window, deltaTime);
+
+        glClearColor(gui.bg_col[0], gui.bg_col[1], gui.bg_col[2], gui.bg_col[3]);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         cube_material.shininess = gui.shine;
         cube_material.emissionStrength = 0.5f;
@@ -69,30 +71,37 @@ int main(void)
         dir_light.specular = glm::vec3(gui.light_spe, gui.light_spe, gui.light_spe);
         dir_light.direction = glm::vec3(gui.light_dir[0], gui.light_dir[1], gui.light_dir[2]);
 
+
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
+
         phong_shader.Use();
         phong_shader.SetMaterial(cube_material);
         phong_shader.SetDirectionLight(dir_light);
-        
-
-        camera.ProcessInput(window, deltaTime);
-
-        glClearColor(gui.bg_col[0],gui.bg_col[1],gui.bg_col[2], gui.bg_col[3]);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        phong_shader.Use();
         phong_shader.SetMat4("view", camera.GetView());
-        phong_shader.SetMat4("projection", camera.GetProjection(mode->width,mode->height));
+        phong_shader.SetMat4("projection", camera.GetProjection(mode->width, mode->height));
         phong_shader.SetVec3("viewPos", camera.cameraPos);
-
-
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::scale(model,glm::vec3(0.1f));
         phong_shader.SetMat4("model", model);
-
         gui.Render_Model(phong_shader);
 
-        gui.Render();
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glStencilMask(0x00);
+        glDisable(GL_DEPTH_TEST);
 
+        outline_shader.Use();
+        outline_shader.SetMat4("view", camera.GetView());
+        outline_shader.SetMat4("projection", camera.GetProjection(mode->width, mode->height));
+        outline_shader.SetMat4("model", model);
+        outline_shader.SetFloat("outlineThickness", gui.thickness);
+        outline_shader.SetVec3("outlineColor", glm::vec3(gui.outline_col[0], gui.outline_col[1], gui.outline_col[2]));
+        gui.Render_Model(outline_shader);
+
+        glStencilMask(0xFF);
+        glEnable(GL_DEPTH_TEST);
+
+        gui.Render();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

@@ -1,12 +1,9 @@
 #version 330 core
-
-in vec3 color;
-
-uniform vec3 objectColor;
-
 out vec4 FragColor;
 
+uniform vec3 outlineColor;
+
 void main()
-{       
-    FragColor = vec4(objectColor,1.0f);
-} 
+{
+    FragColor = vec4(outlineColor, 1.0);
+}

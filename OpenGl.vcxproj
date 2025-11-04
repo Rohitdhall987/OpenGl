@@ -168,6 +168,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\color.glsl" />
+    <None Include="resources\shaders\outline_vertex.glsl" />
     <None Include="src\shaders\frag.glsl" />
     <None Include="src\shaders\vertex.glsl" />
   </ItemGroup>

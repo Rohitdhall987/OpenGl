@@ -46,7 +46,8 @@ void MyImgui::Frames() {
             m = Model(path);
         }
     }
-
+    ImGui::ColorPicker3("OutLine Color", outline_col);
+    ImGui::SliderFloat("Outline Thickness", &thickness, 0.0f, 0.3f);
     ImGui::Spacing();
 
     ImGui::ColorPicker3("BackGround Color", bg_col);
