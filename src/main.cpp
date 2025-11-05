@@ -22,7 +22,7 @@ int main(void)
 
     GLFWmonitor* monitor = glfwGetPrimaryMonitor();
     const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-    GLFWwindow* window = glfwCreateWindow(mode->width, mode->height, "LEARN OPENGL", monitor, NULL);
+    GLFWwindow* window = glfwCreateWindow(mode->width, mode->height, "LEARN OPENGL", NULL, NULL);
     glfwMakeContextCurrent(window);
 
     glewInit();
@@ -82,7 +82,6 @@ int main(void)
         phong_shader.SetMat4("projection", camera.GetProjection(mode->width, mode->height));
         phong_shader.SetVec3("viewPos", camera.cameraPos);
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::scale(model,glm::vec3(0.1f));
         phong_shader.SetMat4("model", model);
         gui.Render_Model(phong_shader);
 

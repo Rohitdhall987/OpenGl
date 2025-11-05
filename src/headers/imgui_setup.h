@@ -8,6 +8,8 @@
 class MyImgui {
 	void Frames();
 
+	static std::vector<std::string> import_types;
+	static std::string selected_im_t;
 	Model m;
 public:
 	MyImgui(GLFWwindow* window);
