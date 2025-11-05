@@ -3,9 +3,11 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include "object.h"
+#include "camera.h"
 
 
 class MyImgui {
+
 	static unsigned int ids;
 	static unsigned int active_obj;
 	static std::vector<Object> objects;
@@ -13,13 +15,17 @@ class MyImgui {
 	static std::string selected_im_t;
 
 	void Frames();
+
+	Camera& camera;
+	GLFWwindow* window;
+	Shader* outline_shader;
+
 public:
-	MyImgui(GLFWwindow* window);
+	MyImgui(GLFWwindow* win, Camera& cam);
 	void Render();
 	void ShutDown();
 	void Render_Models(const Shader& shader);
-	void Render_Outlines(const Shader& outline)
-		;
+	void Render_Outlines();
 
 	float bg_col[4] = { 0.15625f, 0.15625f, 0.15625f, 1.0f };
 	float amb_col[3] = { 0.15625f, 0.15625f, 0.15625f };

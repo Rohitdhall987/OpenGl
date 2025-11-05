@@ -39,10 +39,9 @@ int main(void)
     glfwSetScrollCallback(window, Callback::ScrollCallback);
     glfwSetKeyCallback(window, Callback::KeyCallback);
 
-    MyImgui gui(window);
+    MyImgui gui(window, camera);
     
     Shader phong_shader("resources/shaders/vertex.glsl", "resources/shaders/frag.glsl");
-    Shader outline_shader("resources/shaders/outline_vertex.glsl", "resources/shaders/color.glsl");
    
     Material cube_material;
     DirLight dir_light;
@@ -51,6 +50,10 @@ int main(void)
 
     while (!glfwWindowShouldClose(window))
     {
+
+        int width, height;
+        glfwGetFramebufferSize(window, &width, &height);
+
         glEnable(GL_DEPTH_TEST);
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
@@ -79,18 +82,16 @@ int main(void)
         phong_shader.SetMaterial(cube_material);
         phong_shader.SetDirectionLight(dir_light);
         phong_shader.SetMat4("view", camera.GetView());
-        phong_shader.SetMat4("projection", camera.GetProjection(mode->width, mode->height));
+        phong_shader.SetMat4("projection", camera.GetProjection(width, height));
         phong_shader.SetVec3("viewPos", camera.cameraPos);
-        outline_shader.Use();
-        outline_shader.SetMat4("view", camera.GetView());
-        outline_shader.SetMat4("projection", camera.GetProjection(mode->width, mode->height));
+
 
         gui.Render_Models(phong_shader);
 
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
         glStencilMask(0x00);
         glDisable(GL_DEPTH_TEST);
-        gui.Render_Outlines(outline_shader);
+        gui.Render_Outlines();
 
         glStencilMask(0xFF);
         glEnable(GL_DEPTH_TEST);

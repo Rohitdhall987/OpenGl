@@ -5,7 +5,7 @@ layout (location = 1) in vec3 aNormal;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
-uniform float outlineThickness;  // e.g. 0.02
+uniform float outlineThickness;
 
 void main()
 {

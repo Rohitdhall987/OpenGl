@@ -2,7 +2,6 @@
 #include "headers/utils/windoes_utils.h"
 
 #include <codecvt> 
-#include <filesystem>
 
 unsigned int MyImgui::ids = 0;
 unsigned int MyImgui::active_obj = 0;
@@ -11,13 +10,19 @@ std::vector<std::string> MyImgui::import_types = { "fbx", "obj","glb", "gltf", "
 
 std::string MyImgui::selected_im_t = MyImgui::import_types[0];
 
-MyImgui::MyImgui(GLFWwindow* window) {
+
+
+MyImgui::MyImgui(GLFWwindow* win, Camera& cam) : camera(cam) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
 
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplGlfw_InitForOpenGL(win, true);
     ImGui_ImplOpenGL3_Init();
+
+
+    window = win;
+    outline_shader = new Shader("resources/shaders/outline_vertex.glsl", "resources/shaders/color.glsl");
 }
 
 void MyImgui::ShutDown() {
@@ -36,17 +41,24 @@ void MyImgui::Render_Models(const Shader& shader)
     }
 }
 
-void MyImgui::Render_Outlines(const Shader& outline)
+void MyImgui::Render_Outlines()
 {
+
+
+
     for (const Object& obj : objects)
     {
         if (obj.id == active_obj)
         {
-            outline.Use();
-            outline.SetMat4("model", obj.transform);
-            outline.SetFloat("outlineThickness", thickness);
-            outline.SetVec3("outlineColor", glm::vec3(outline_col[0], outline_col[1], outline_col[2]));
-            obj.model.Draw(outline);
+            int width, height;
+            glfwGetFramebufferSize(window,&width,&height);
+            outline_shader->Use();
+            outline_shader->SetMat4("view", camera.GetView());
+            outline_shader->SetMat4("projection", camera.GetProjection(width, height));
+            outline_shader->SetMat4("model", obj.transform);
+            outline_shader->SetFloat("outlineThickness", thickness);
+            outline_shader->SetVec3("outlineColor", glm::vec3(outline_col[0], outline_col[1], outline_col[2]));
+            obj.model.Draw(*outline_shader);
         }
     }
 }
@@ -150,9 +162,8 @@ void MyImgui::Frames() {
     ImGui::Begin("Objects");
 
     for (auto& obj : objects) {
-        if (ImGui::Selectable(obj.name.c_str(), obj.id == active_obj)) 
+        if (ImGui::Selectable(obj.name.c_str(), obj.id == active_obj))
             active_obj = obj.id;
-        
     }
 
     ImGui::End();
