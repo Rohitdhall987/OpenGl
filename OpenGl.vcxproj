@@ -162,6 +162,7 @@
     <ClInclude Include="src\headers\imgui_setup.h" />
     <ClInclude Include="src\headers\mesh.h" />
     <ClInclude Include="src\headers\model.h" />
+    <ClInclude Include="src\headers\object.h" />
     <ClInclude Include="src\headers\shader.h" />
     <ClInclude Include="src\headers\types.h" />
     <ClInclude Include="src\headers\utils\windoes_utils.h" />

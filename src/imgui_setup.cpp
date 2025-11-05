@@ -2,7 +2,11 @@
 #include "headers/utils/windoes_utils.h"
 
 #include <codecvt> 
+#include <filesystem>
 
+unsigned int MyImgui::ids = 0;
+unsigned int MyImgui::active_obj = 0;
+std::vector<Object> MyImgui::objects = {};
 std::vector<std::string> MyImgui::import_types = { "fbx", "obj","glb", "gltf", "stl", "ply", "3ds", "blend", "dae", "pmx" };
 
 std::string MyImgui::selected_im_t = MyImgui::import_types[0];
@@ -22,10 +26,31 @@ void MyImgui::ShutDown() {
     ImGui::DestroyContext();
 }
 
-void MyImgui::Render_Model(const Shader& shader)
+void MyImgui::Render_Models(const Shader& shader)
 {
-    m.Draw(shader);
+    for (const Object& obj : objects)
+    {
+        shader.Use();
+        shader.SetMat4("model", obj.transform);
+        obj.model.Draw(shader);
+    }
 }
+
+void MyImgui::Render_Outlines(const Shader& outline)
+{
+    for (const Object& obj : objects)
+    {
+        if (obj.id == active_obj)
+        {
+            outline.Use();
+            outline.SetMat4("model", obj.transform);
+            outline.SetFloat("outlineThickness", thickness);
+            outline.SetVec3("outlineColor", glm::vec3(outline_col[0], outline_col[1], outline_col[2]));
+            obj.model.Draw(outline);
+        }
+    }
+}
+
 
 void MyImgui::Render() {
     ImGui_ImplOpenGL3_NewFrame();
@@ -34,6 +59,7 @@ void MyImgui::Render() {
     Frames();
 
     ImGui::Render();
+    
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
@@ -83,8 +109,16 @@ void MyImgui::Frames() {
             if (!filepath.empty()) {
                 std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
                 std::string path = converter.to_bytes(filepath);
-
-                m = Model(path);
+                size_t pos = filepath.find_last_of(L"\\/");
+                std::wstring filename;
+                if (pos != std::wstring::npos)
+                    filename = filepath.substr(pos + 1);
+                else
+                    filename = filepath;
+                glm::mat4 trans(1.0f);
+                Object obj = { ids, converter.to_bytes(filename), Model(path), "shader", trans};
+                objects.push_back(obj);
+                ids++;
             }
             ImGui::CloseCurrentPopup();
         }
@@ -93,8 +127,8 @@ void MyImgui::Frames() {
 
         ImGui::EndPopup();
     }
-    //ImGui::ColorPicker3("OutLine Color", outline_col);
     ImGui::SliderFloat("Outline Thickness", &thickness, 0.0f, 0.3f);
+    ImGui::ColorPicker3("OutLine Color", outline_col);
     ImGui::Spacing();
 
     ImGui::ColorPicker3("BackGround Color", bg_col);
@@ -111,4 +145,16 @@ void MyImgui::Frames() {
     ImGui::SliderFloat("specular", &light_spe, 0.0f, 10.0f);
     
     ImGui::End();
+
+
+    ImGui::Begin("Objects");
+
+    for (auto& obj : objects) {
+        if (ImGui::Selectable(obj.name.c_str(), obj.id == active_obj)) 
+            active_obj = obj.id;
+        
+    }
+
+    ImGui::End();
+
 }

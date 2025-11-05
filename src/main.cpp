@@ -81,21 +81,16 @@ int main(void)
         phong_shader.SetMat4("view", camera.GetView());
         phong_shader.SetMat4("projection", camera.GetProjection(mode->width, mode->height));
         phong_shader.SetVec3("viewPos", camera.cameraPos);
-        glm::mat4 model = glm::mat4(1.0f);
-        phong_shader.SetMat4("model", model);
-        gui.Render_Model(phong_shader);
+        outline_shader.Use();
+        outline_shader.SetMat4("view", camera.GetView());
+        outline_shader.SetMat4("projection", camera.GetProjection(mode->width, mode->height));
+
+        gui.Render_Models(phong_shader);
 
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
         glStencilMask(0x00);
         glDisable(GL_DEPTH_TEST);
-
-        outline_shader.Use();
-        outline_shader.SetMat4("view", camera.GetView());
-        outline_shader.SetMat4("projection", camera.GetProjection(mode->width, mode->height));
-        outline_shader.SetMat4("model", model);
-        outline_shader.SetFloat("outlineThickness", gui.thickness);
-        outline_shader.SetVec3("outlineColor", glm::vec3(gui.outline_col[0], gui.outline_col[1], gui.outline_col[2]));
-        gui.Render_Model(outline_shader);
+        gui.Render_Outlines(outline_shader);
 
         glStencilMask(0xFF);
         glEnable(GL_DEPTH_TEST);

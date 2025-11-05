@@ -2,20 +2,24 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#include "object.h"
 
-#include "model.h"
 
 class MyImgui {
-	void Frames();
-
+	static unsigned int ids;
+	static unsigned int active_obj;
+	static std::vector<Object> objects;
 	static std::vector<std::string> import_types;
 	static std::string selected_im_t;
-	Model m;
+
+	void Frames();
 public:
 	MyImgui(GLFWwindow* window);
 	void Render();
 	void ShutDown();
-	void Render_Model(const Shader& shader);
+	void Render_Models(const Shader& shader);
+	void Render_Outlines(const Shader& outline)
+		;
 
 	float bg_col[4] = { 0.15625f, 0.15625f, 0.15625f, 1.0f };
 	float amb_col[3] = { 0.15625f, 0.15625f, 0.15625f };
