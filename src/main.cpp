@@ -41,18 +41,17 @@ int main(void)
 
     MyImgui gui(window, camera);
     
-    Shader phong_shader("resources/shaders/vertex.glsl", "resources/shaders/frag.glsl");
+
    
-    Material cube_material;
-    DirLight dir_light;
+
 
     float deltaTime = 0.0f, lastFrame = 0.0f;
 
     while (!glfwWindowShouldClose(window))
     {
 
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
+        
+        
 
         glEnable(GL_DEPTH_TEST);
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -66,27 +65,16 @@ int main(void)
         glClearColor(gui.bg_col[0], gui.bg_col[1], gui.bg_col[2], gui.bg_col[3]);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        cube_material.shininess = gui.shine;
-        cube_material.emissionStrength = 0.5f;
 
-        dir_light.ambient = glm::vec3(gui.amb_col[0], gui.amb_col[1], gui.amb_col[2]);
-        dir_light.diffuse = glm::vec3(gui.light_col[0], gui.light_col[1], gui.light_col[2]);
-        dir_light.specular = glm::vec3(gui.light_spe, gui.light_spe, gui.light_spe);
-        dir_light.direction = glm::vec3(gui.light_dir[0], gui.light_dir[1], gui.light_dir[2]);
 
 
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
         glStencilMask(0xFF);
 
-        phong_shader.Use();
-        phong_shader.SetMaterial(cube_material);
-        phong_shader.SetDirectionLight(dir_light);
-        phong_shader.SetMat4("view", camera.GetView());
-        phong_shader.SetMat4("projection", camera.GetProjection(width, height));
-        phong_shader.SetVec3("viewPos", camera.cameraPos);
 
 
-        gui.Render_Models(phong_shader);
+
+        gui.Render_Models();
 
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
         glStencilMask(0x00);

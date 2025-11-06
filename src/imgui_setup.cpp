@@ -31,13 +31,29 @@ void MyImgui::ShutDown() {
     ImGui::DestroyContext();
 }
 
-void MyImgui::Render_Models(const Shader& shader)
+void MyImgui::Render_Models()
 {
+    glfwGetFramebufferSize(window, &width, &height);
+
+    material.shininess = shine;
+    material.emissionStrength = 0.5f;
+
+    dir_light.ambient = glm::vec3(amb_col[0], amb_col[1], amb_col[2]);
+    dir_light.diffuse = glm::vec3(light_col[0], light_col[1], light_col[2]);
+    dir_light.specular = glm::vec3(light_spe, light_spe, light_spe);
+    dir_light.direction = glm::vec3(light_dir[0], light_dir[1], light_dir[2]);
+
     for (const Object& obj : objects)
     {
-        shader.Use();
-        shader.SetMat4("model", obj.transform);
-        obj.model.Draw(shader);
+        obj.shader->Use();
+        obj.shader->SetMaterial(material);
+        obj.shader->SetDirectionLight(dir_light);
+        obj.shader->SetMat4("view", camera.GetView());
+        obj.shader->SetMat4("projection", camera.GetProjection(width, height));
+        obj.shader->SetVec3("viewPos", camera.cameraPos);
+
+        obj.shader->SetMat4("model", obj.transform);
+        obj.model.Draw(*(obj.shader));
     }
 }
 
@@ -50,8 +66,6 @@ void MyImgui::Render_Outlines()
     {
         if (obj.id == active_obj)
         {
-            int width, height;
-            glfwGetFramebufferSize(window,&width,&height);
             outline_shader->Use();
             outline_shader->SetMat4("view", camera.GetView());
             outline_shader->SetMat4("projection", camera.GetProjection(width, height));
@@ -128,7 +142,8 @@ void MyImgui::Frames() {
                 else
                     filename = filepath;
                 glm::mat4 trans(1.0f);
-                Object obj = { ids, converter.to_bytes(filename), Model(path), "shader", trans};
+                Shader *sdr=new Shader("resources/shaders/vertex.glsl", "resources/shaders/frag.glsl");
+                Object obj = { ids, converter.to_bytes(filename), Model(path), sdr, trans};
                 objects.push_back(obj);
                 ids++;
             }

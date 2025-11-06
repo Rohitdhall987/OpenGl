@@ -6,6 +6,6 @@ struct Object {
     unsigned int id;
     std::string name;
     Model model;
-    std::string shader;
+    Shader* shader;
     glm::mat4 transform;
 };

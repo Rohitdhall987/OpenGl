@@ -20,11 +20,15 @@ class MyImgui {
 	GLFWwindow* window;
 	Shader* outline_shader;
 
+	int width, height;
+
+	Material material;
+	DirLight dir_light;
 public:
 	MyImgui(GLFWwindow* win, Camera& cam);
 	void Render();
 	void ShutDown();
-	void Render_Models(const Shader& shader);
+	void Render_Models();
 	void Render_Outlines();
 
 	float bg_col[4] = { 0.15625f, 0.15625f, 0.15625f, 1.0f };
