@@ -9,7 +9,7 @@
 class Model {
 public:
     Model() = default;
-    explicit Model(const std::string& path);
+    explicit Model(const std::string& path, bool inverted);
     void Draw(const Shader& shader) const;
 
 private:
@@ -17,7 +17,7 @@ private:
     std::vector<Texture> loaded_textures;
     std::string directory;
 
-    void loadModel(const std::string& path);
+    void loadModel(const std::string& path, bool inverted);
     void processNode(aiNode* node, const aiScene* scene);
     Mesh processMesh(aiMesh* mesh, const aiScene* scene);
     std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::string& typeName);

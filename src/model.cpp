@@ -7,8 +7,8 @@
 #include "headers/model.h"
 #include "headers/utils/windoes_utils.h"
 
-Model::Model(const std::string& path) {
-    loadModel(path);
+Model::Model(const std::string& path, bool inverted) {
+    loadModel(path, inverted);
 }
 
 void Model::Draw(const Shader& shader) const {
@@ -16,10 +16,17 @@ void Model::Draw(const Shader& shader) const {
         mesh.Draw(shader);
 }
 
-void Model::loadModel(const std::string& path) {
+void Model::loadModel(const std::string& path, bool inverted) {
     Assimp::Importer importer;
-    //const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
-    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenNormals);
+    
+    const aiScene* scene;
+    
+    if (inverted) {
+        scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
+    }
+    else {
+        scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenNormals);
+    }
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         std::cerr << "ASSIMP ERROR: " << importer.GetErrorString() << "\n";

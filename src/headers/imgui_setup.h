@@ -10,6 +10,7 @@ class MyImgui {
 
 	static unsigned int ids;
 	static unsigned int active_obj;
+	static bool invert_textures;
 	static std::vector<Object> objects;
 	static std::vector<std::string> import_types;
 	static std::string selected_im_t;
@@ -22,7 +23,6 @@ class MyImgui {
 
 	int width, height;
 
-	Material material;
 	DirLight dir_light;
 public:
 	MyImgui(GLFWwindow* win, Camera& cam);
@@ -36,7 +36,5 @@ public:
 	float light_dir[3] = { -0.3f, -0.8f, -0.6f };
 	float light_col[3] = { 1.0f, 1.0f, 1.0f };
 	float outline_col[3] = { 1.0f, 1.0f, 1.0f };
-	float light_spe = 1.0f;
-	float shine = 32.0f;
 	float thickness = 0.02f;
 };

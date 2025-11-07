@@ -8,4 +8,5 @@ struct Object {
     Model model;
     Shader* shader;
     glm::mat4 transform;
+    Material material_prop;
 };

@@ -117,6 +117,7 @@ void Shader::SetMaterial(Material value) const {
     //SetInt("material.emission", 2);
     SetFloat("material.shininess", value.shininess);
     SetFloat("material.emissionStrength", value.emissionStrength);
+    SetVec3("material.specular", glm::vec3(value.specular));
 }
 
 void Shader::SetPointLight(PointLight value, int index) const
@@ -134,6 +135,5 @@ void Shader::SetDirectionLight(DirLight value) const
 {
     SetVec3("dirLight.direction", value.direction);
     SetVec3("dirLight.ambient", value.ambient);
-    SetVec3("dirLight.specular", value.specular);
     SetVec3("dirLight.diffuse", value.diffuse);
 }

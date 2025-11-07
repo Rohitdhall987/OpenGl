@@ -7,8 +7,9 @@ struct Material {
     //Texture* diffuseMap;   
     //Texture* specularMap;
     //Texture* emissionMap;
-    float shininess;
-    float emissionStrength;
+    float shininess = 32.0f;
+    float emissionStrength = 0.5f;
+    float specular = 1.0f;
 };
 
 struct DirLight {
@@ -16,7 +17,6 @@ struct DirLight {
 
     glm::vec3 ambient;
     glm::vec3 diffuse;
-    glm::vec3 specular;
 };
 
 struct PointLight {

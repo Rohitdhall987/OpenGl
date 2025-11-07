@@ -54,7 +54,7 @@ int main(void)
         
 
         glEnable(GL_DEPTH_TEST);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
 
         double currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
