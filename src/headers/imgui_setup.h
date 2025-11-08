@@ -29,6 +29,7 @@ public:
 	void Render();
 	void ShutDown();
 	void Render_Models();
+	void Render_Selected_Model();
 	void Render_Outlines();
 
 	float bg_col[4] = { 0.15625f, 0.15625f, 0.15625f, 1.0f };

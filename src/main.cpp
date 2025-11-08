@@ -49,43 +49,36 @@ int main(void)
 
     while (!glfwWindowShouldClose(window))
     {
-
-        
-        
-
         glEnable(GL_DEPTH_TEST);
-        glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-
         double currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-
         camera.ProcessInput(window, deltaTime);
-
         glClearColor(gui.bg_col[0], gui.bg_col[1], gui.bg_col[2], gui.bg_col[3]);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-
-
-
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        glStencilMask(0xFF);
-
-
-
-
+        
+        glStencilFunc(GL_ALWAYS, 0, 0xFF);
+        glStencilMask(0x00);  
         gui.Render_Models();
+
+        
+        glDisable(GL_DEPTH_TEST);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);  
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); 
+        gui.Render_Selected_Model();  
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);  
+
 
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
         glStencilMask(0x00);
-        glDisable(GL_DEPTH_TEST);
         gui.Render_Outlines();
 
         glStencilMask(0xFF);
         glEnable(GL_DEPTH_TEST);
-
         gui.Render();
-
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

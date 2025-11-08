@@ -54,6 +54,22 @@ void MyImgui::Render_Models()
     }
 }
 
+void MyImgui::Render_Selected_Model()
+{
+    for (const Object& obj : objects)
+    {
+        if (obj.id == active_obj)
+        {
+            obj.shader->Use();
+            obj.shader->SetMat4("view", camera.GetView());
+            obj.shader->SetMat4("projection", camera.GetProjection(width, height));
+            obj.shader->SetMat4("model", obj.transform);
+            obj.model.Draw(*obj.shader);
+            break;
+        }
+    }
+}
+
 void MyImgui::Render_Outlines()
 {
     for (const Object& obj : objects)
