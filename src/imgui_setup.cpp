@@ -39,7 +39,7 @@ void MyImgui::Render_Models()
     dir_light.diffuse = glm::vec3(light_col[0], light_col[1], light_col[2]);
     dir_light.direction = glm::vec3(light_dir[0], light_dir[1], light_dir[2]);
 
-    for (const Object& obj : objects)
+    for (Object& obj : objects)
     {
 
         obj.shader->Use();
@@ -48,8 +48,16 @@ void MyImgui::Render_Models()
         obj.shader->SetMat4("view", camera.GetView());
         obj.shader->SetMat4("projection", camera.GetProjection(width, height));
         obj.shader->SetVec3("viewPos", camera.cameraPos);
+
+
+        obj.modelMatrix = glm::translate(glm::mat4(1.0f), obj.transform.position);
+        obj.modelMatrix = glm::rotate(obj.modelMatrix, obj.transform.rotation.z, glm::vec3(0, 0, 1));
+        obj.modelMatrix = glm::rotate(obj.modelMatrix, obj.transform.rotation.y, glm::vec3(0, 1, 0));
+        obj.modelMatrix = glm::rotate(obj.modelMatrix, obj.transform.rotation.x, glm::vec3(1, 0, 0));
+        obj.modelMatrix = glm::scale(obj.modelMatrix, obj.transform.scale);
                   
-        obj.shader->SetMat4("model", obj.transform);
+        obj.shader->SetMat4("model", obj.modelMatrix);
+
         obj.model.Draw(*obj.shader);
     }
 }
@@ -63,7 +71,7 @@ void MyImgui::Render_Selected_Model()
             obj.shader->Use();
             obj.shader->SetMat4("view", camera.GetView());
             obj.shader->SetMat4("projection", camera.GetProjection(width, height));
-            obj.shader->SetMat4("model", obj.transform);
+            obj.shader->SetMat4("model", obj.modelMatrix);
             obj.model.Draw(*obj.shader);
             break;
         }
@@ -79,7 +87,7 @@ void MyImgui::Render_Outlines()
             outline_shader->Use();
             outline_shader->SetMat4("view", camera.GetView());
             outline_shader->SetMat4("projection", camera.GetProjection(width, height));
-            outline_shader->SetMat4("model", obj.transform);
+            outline_shader->SetMat4("model", obj.modelMatrix);
             outline_shader->SetFloat("outlineThickness", thickness);
             outline_shader->SetVec3("outlineColor", glm::vec3(outline_col[0], outline_col[1], outline_col[2]));
             obj.model.Draw(*outline_shader);
@@ -151,10 +159,11 @@ void MyImgui::Frames() {
                     filename = filepath.substr(pos + 1);
                 else
                     filename = filepath;
-                glm::mat4 trans(1.0f);
+                Transform trans;
+                Material prop;
                 Shader* sdr = new Shader("resources/shaders/vertex.glsl", "resources/shaders/frag.glsl");
-                Object obj = { ids, converter.to_bytes(filename), Model(path, invert_textures), sdr, trans};
-                obj.material_prop = Material();
+                Object obj = { ids, converter.to_bytes(filename), Model(path, invert_textures), sdr, trans, prop};
+
                 objects.push_back(obj);
                 ids++;
             }
@@ -206,6 +215,15 @@ void MyImgui::Frames() {
 
         ImGui::SliderFloat("Shininess", &(objects[active_index].material_prop.shininess), 1.0f, 256.0f);
         ImGui::SliderFloat("specular", &(objects[active_index].material_prop.specular), 0.0f, 10.0f);
+        
+        ImGui::Spacing();
+
+        ImGui::Text("Transform xyz");
+        
+        ImGui::DragFloat3("Position", glm::value_ptr(objects[active_index].transform.position), 0.2f);
+        ImGui::DragFloat3("Rotaion", glm::value_ptr(objects[active_index].transform.rotation), 0.2f);
+        ImGui::DragFloat3("Scale", glm::value_ptr(objects[active_index].transform.scale), 0.2f);
+
         ImGui::End();
     }
 }
