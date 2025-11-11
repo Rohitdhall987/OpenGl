@@ -47,11 +47,9 @@ uniform sampler2D texture_specular2;
 out vec4 FragColor;
 
 // Function declarations
-vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir); 
+vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, out float alpha); 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
-
-// Blend helper
-vec3 GetDiffuseColor();
+vec4 GetDiffuseColor();
 vec3 GetSpecularColor();
 
 void main()
@@ -59,24 +57,30 @@ void main()
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - FragPos);
 
-    // Calculate lighting
-    vec3 result = CalcDirLight(dirLight, norm, viewDir);
-    //for (int i = 0; i < NR_POINT_LIGHTS; i++)
-    //    result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);       
+    float alpha;
+    vec3 lighting = CalcDirLight(dirLight, norm, viewDir, alpha);
     
-    // Add emissive contribution
+    // Optional: Add point lights
+    //for (int i = 0; i < NR_POINT_LIGHTS; i++)
+    //    lighting += CalcPointLight(pointLights[i], norm, FragPos, viewDir);       
+    
+    // Optional: Add emissive
     //vec3 emission = texture(material.emission, TextureCoord).rgb * material.emissionStrength;
-    //result += emission;
+    //lighting += emission;
 
-    FragColor = vec4(result, 1.0);
+    FragColor = vec4(lighting, alpha);
+
+    // Optionally discard fully transparent fragments
+    if (FragColor.a < 0.05)
+        discard;
 }
 
 // === Texture sampling ===
-vec3 GetDiffuseColor()
+vec4 GetDiffuseColor()
 {
-    vec3 diffuse1 = texture(texture_diffuse1, TextureCoord).rgb;
-    vec3 diffuse2 = texture(texture_diffuse2, TextureCoord).rgb;
-    vec3 diffuse3 = texture(texture_diffuse3, TextureCoord).rgb;
+    vec4 diffuse1 = texture(texture_diffuse1, TextureCoord);
+    vec4 diffuse2 = texture(texture_diffuse2, TextureCoord);
+    vec4 diffuse3 = texture(texture_diffuse3, TextureCoord);
     return (diffuse1 + diffuse2 + diffuse3) / 3.0; // blend equally
 }
 
@@ -88,22 +92,24 @@ vec3 GetSpecularColor()
 }
 
 // === Directional Light ===
-vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
+vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, out float alpha)
 {
     vec3 lightDir = normalize(-light.direction);
+
+    vec4 diffuseTex = GetDiffuseColor();
+    vec3 specularTex = GetSpecularColor();
+    alpha = diffuseTex.a; // Store alpha from diffuse texture
 
     float diff = max(dot(normal, lightDir), 0.0);
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 
-    vec3 diffuseTex = GetDiffuseColor();
-    vec3 specularTex = GetSpecularColor();
-
-    vec3 ambient  = light.ambient  * diffuseTex;
-    vec3 diffuse  = light.diffuse  * diff * diffuseTex;
+    vec3 ambient  = light.ambient  * diffuseTex.rgb;
+    vec3 diffuse  = light.diffuse  * diff * diffuseTex.rgb;
     vec3 specular = material.specular * spec * specularTex;
+
     return (ambient + diffuse + specular);
-}  
+}
 
 // === Point Light ===
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
@@ -118,7 +124,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float attenuation = 1.0 / (light.constant + light.linear * distance +
                                light.quadratic * (distance * distance));    
 
-    vec3 diffuseTex = GetDiffuseColor();
+    vec3 diffuseTex = GetDiffuseColor().rgb;
     vec3 specularTex = GetSpecularColor();
 
     vec3 ambient  = light.ambient  * diffuseTex;
