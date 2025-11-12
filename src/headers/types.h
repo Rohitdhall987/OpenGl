@@ -10,6 +10,7 @@ struct Material {
     float shininess = 32.0f;
     float emissionStrength = 0.5f;
     float specular = 1.0f;
+    bool face_culling = false;
 };
 
 struct DirLight {

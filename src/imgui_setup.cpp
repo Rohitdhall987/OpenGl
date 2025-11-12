@@ -62,6 +62,11 @@ void MyImgui::Render_Models()
     for (Object& obj : temp)
     {
 
+        if (obj.material_prop.face_culling)
+            glEnable(GL_CULL_FACE);
+        else
+            glDisable(GL_CULL_FACE);
+
         obj.shader->Use();
         obj.shader->SetMaterial(obj.material_prop);
         obj.shader->SetDirectionLight(dir_light);
@@ -207,9 +212,9 @@ void MyImgui::Frames() {
 
         ImGui::EndPopup();
     }
-    ImGui::SliderFloat("Outline Thickness", &thickness, 0.0f, 0.3f);
-    ImGui::ColorPicker3("OutLine Color", outline_col);
-    ImGui::Spacing();
+    //ImGui::SliderFloat("Outline Thickness", &thickness, 0.0f, 0.3f);
+    //ImGui::ColorPicker3("OutLine Color", outline_col);
+    //ImGui::Spacing();
 
     ImGui::ColorPicker3("BackGround Color", bg_col);
 
@@ -256,6 +261,10 @@ void MyImgui::Frames() {
         ImGui::DragFloat3("Position", glm::value_ptr(objects[active_index].transform.position), 0.2f);
         ImGui::DragFloat3("Rotaion", glm::value_ptr(objects[active_index].transform.rotation), 0.2f);
         ImGui::DragFloat3("Scale", glm::value_ptr(objects[active_index].transform.scale), 0.2f);
+
+        ImGui::Spacing();
+
+        ImGui::Checkbox("Face culling", &objects[active_index].material_prop.face_culling);
 
         ImGui::End();
     }
