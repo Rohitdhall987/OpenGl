@@ -99,6 +99,12 @@ void Shader::SetInt(std::string name, int value) const
     glUniform1i(loc, value);
 }
 
+void Shader::SetVec2(std::string name, glm::vec2 value) const
+{
+    unsigned int loc = GetUniform(name);
+    glUniform2fv(loc, 1, glm::value_ptr(value));
+}
+
 void Shader::SetVec3(std::string name, glm::vec3 value) const
 {
     unsigned int loc = GetUniform(name);

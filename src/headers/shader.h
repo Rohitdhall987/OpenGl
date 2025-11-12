@@ -23,6 +23,7 @@ public:
 
     void SetFloat(std::string name, float value) const;
     void SetInt(std::string name, int value) const;
+    void SetVec2(std::string name, glm::vec2 value) const;
     void SetVec3(std::string name, glm::vec3 value) const;
     void SetMat4(std::string name, glm::mat4 value) const;
     void SetMaterial( Material value) const;
