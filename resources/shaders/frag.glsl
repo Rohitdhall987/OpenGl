@@ -30,6 +30,10 @@ in vec3 Normal;
 in vec3 FragPos;
 in vec2 TextureCoord;
 
+
+
+uniform int render_pass;
+
 uniform Material material;
 uniform DirLight dirLight;
 
@@ -68,11 +72,24 @@ void main()
     //vec3 emission = texture(material.emission, TextureCoord).rgb * material.emissionStrength;
     //lighting += emission;
 
-    FragColor = vec4(lighting, alpha);
 
-    // Optionally discard fully transparent fragments
-    if (FragColor.a < 0.05)
-        discard;
+    //vec4 texColor = texture(texture_diffuse1, TextureCoord);
+
+    if(render_pass == 1){
+
+        if(alpha < 0.99)
+            discard;
+        
+    }else if(render_pass == 2){
+        
+        if(alpha >= 0.99)
+            discard;
+
+    }
+
+
+    
+    FragColor = vec4(lighting, alpha);
 }
 
 // === Texture sampling ===

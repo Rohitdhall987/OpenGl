@@ -24,6 +24,8 @@ class MyImgui {
 	int width, height;
 
 	DirLight dir_light;
+
+	bool compare(const Object &obj1, const Object &obj2);
 public:
 	MyImgui(GLFWwindow* win, Camera& cam);
 	void Render();

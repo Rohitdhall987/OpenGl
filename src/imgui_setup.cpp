@@ -1,7 +1,8 @@
-#include "headers/imgui_setup.h"
 #include "headers/utils/windoes_utils.h"
+#include "headers/imgui_setup.h"
 
 #include <codecvt> 
+#include <algorithm> 
 
 unsigned int MyImgui::ids = 0;
 unsigned int MyImgui::active_obj = 0;
@@ -24,6 +25,17 @@ MyImgui::MyImgui(GLFWwindow* win, Camera& cam) : camera(cam) {
     outline_shader = new Shader("resources/shaders/outline_vertex.glsl", "resources/shaders/color.glsl");
 }
 
+bool MyImgui::compare(const Object& obj1, const Object& obj2)
+{
+
+        glm::vec3 pos = camera.cameraPos;
+
+        float disA = glm::length(pos - obj1.transform.position);
+        float disB = glm::length(pos - obj2.transform.position);
+        
+        return disA > disB;
+}
+
 void MyImgui::ShutDown() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
@@ -32,14 +44,22 @@ void MyImgui::ShutDown() {
 
 void MyImgui::Render_Models()
 {
-
     glfwGetFramebufferSize(window, &width, &height);
+
+    std::vector<Object> temp = objects;
+
+    std::sort(temp.begin(), temp.end(),
+        [this](const Object& a, const Object& b) {
+            return compare(a, b);
+        });
+
+
 
     dir_light.ambient = glm::vec3(amb_col[0], amb_col[1], amb_col[2]);
     dir_light.diffuse = glm::vec3(light_col[0], light_col[1], light_col[2]);
     dir_light.direction = glm::vec3(light_dir[0], light_dir[1], light_dir[2]);
 
-    for (Object& obj : objects)
+    for (Object& obj : temp)
     {
 
         obj.shader->Use();
@@ -58,7 +78,15 @@ void MyImgui::Render_Models()
                   
         obj.shader->SetMat4("model", obj.modelMatrix);
 
+        obj.shader->SetInt("render_pass", 1);
         obj.model.Draw(*obj.shader);
+
+        glDepthMask(GL_FALSE);
+
+        obj.shader->SetInt("render_pass", 2);
+        obj.model.Draw(*obj.shader);
+
+        glDepthMask(GL_TRUE);
     }
 }
 
@@ -159,8 +187,13 @@ void MyImgui::Frames() {
                     filename = filepath.substr(pos + 1);
                 else
                     filename = filepath;
+
+                
+
                 Transform trans;
                 Material prop;
+
+                
                 Shader* sdr = new Shader("resources/shaders/vertex.glsl", "resources/shaders/frag.glsl");
                 Object obj = { ids, converter.to_bytes(filename), Model(path, invert_textures), sdr, trans, prop};
 
@@ -198,7 +231,7 @@ void MyImgui::Frames() {
 
     static unsigned int active_index = 0;
 
-    for (int i = 0; i < objects.size(); i++) {
+    for (unsigned int i = 0; i < objects.size(); i++) {
 
         Object obj = objects[i];
 

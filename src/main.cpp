@@ -27,8 +27,10 @@ int main(void)
 
     glewInit();
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_STENCIL_TEST);
+    //glEnable(GL_STENCIL_TEST);
 
     Camera camera;
     glfwSetWindowUserPointer(window, &camera);
@@ -40,22 +42,18 @@ int main(void)
     glfwSetKeyCallback(window, Callback::KeyCallback);
 
     MyImgui gui(window, camera);
-    
-
-   
-
 
     float deltaTime = 0.0f, lastFrame = 0.0f;
 
     while (!glfwWindowShouldClose(window))
     {
-        glEnable(GL_DEPTH_TEST);
         double currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         camera.ProcessInput(window, deltaTime);
         glClearColor(gui.bg_col[0], gui.bg_col[1], gui.bg_col[2], gui.bg_col[3]);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
         
         glStencilFunc(GL_ALWAYS, 0, 0xFF);
@@ -63,21 +61,21 @@ int main(void)
         gui.Render_Models();
 
         
-        glDisable(GL_DEPTH_TEST);
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        glStencilMask(0xFF);  
-        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); 
-        gui.Render_Selected_Model();  
-        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);  
+        //glDisable(GL_DEPTH_TEST);
+        //glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        //glStencilMask(0xFF);  
+        //glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        //glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); 
+        //gui.Render_Selected_Model();  
+        //glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);  
 
 
-        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-        glStencilMask(0x00);
-        gui.Render_Outlines();
+        //glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        //glStencilMask(0x00);
+        //gui.Render_Outlines();
 
-        glStencilMask(0xFF);
-        glEnable(GL_DEPTH_TEST);
+        //glStencilMask(0xFF);
+        //glEnable(GL_DEPTH_TEST);
         gui.Render();
         glfwSwapBuffers(window);
         glfwPollEvents();
