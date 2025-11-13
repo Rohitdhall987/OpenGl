@@ -130,5 +130,7 @@
     <None Include="resources\shaders\outline_vertex.glsl" />
     <None Include="resources\shaders\frame_vert.glsl" />
     <None Include="resources\shaders\frame_buffer.glsl" />
+    <None Include="resources\shaders\skybox_vert.glsl" />
+    <None Include="resources\shaders\skybox_frag.glsl" />
   </ItemGroup>
 </Project>
