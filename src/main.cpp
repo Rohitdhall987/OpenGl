@@ -65,10 +65,13 @@ int main(void)
 {
     glfwInit();
 
+    unsigned short int samples = 8;
+
     glfwSetErrorCallback(Callback::errCallBack);
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_SAMPLES, samples);
 
     GLFWmonitor* monitor = glfwGetPrimaryMonitor();
     const GLFWvidmode* mode = glfwGetVideoMode(monitor);
@@ -79,6 +82,7 @@ int main(void)
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_MULTISAMPLE);
     //glEnable(GL_STENCIL_TEST);
 
     Camera camera;
@@ -93,25 +97,27 @@ int main(void)
     MyImgui gui(window, camera);
 
 
+
     unsigned int FBO;
     glGenFramebuffers(1, &FBO);
     glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 
     unsigned int frameBufferTexture;
     glGenTextures(1, &frameBufferTexture);
-    glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, frameBufferTexture);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mode->width, mode->height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGB, mode->width, mode->height, GL_TRUE);
+    glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, frameBufferTexture, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, frameBufferTexture, 0);
 
 
     unsigned int RBO;
     glGenRenderbuffers(1, &RBO);
     glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, mode->width, mode->height);
+    glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH24_STENCIL8, mode->width, mode->height);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
@@ -120,6 +126,22 @@ int main(void)
         exit(2);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+
+    unsigned int resolveFBO;
+    glGenFramebuffers(1, &resolveFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, resolveFBO);
+
+    unsigned int resolveTex;
+    glGenTextures(1, &resolveTex);
+    glBindTexture(GL_TEXTURE_2D, resolveTex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mode->width, mode->height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, resolveTex, 0);
+
+
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
 
@@ -207,11 +229,13 @@ int main(void)
 
         glfwGetFramebufferSize(window, &width, &height);
 
-        glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, frameBufferTexture);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGB, width, height, GL_TRUE);
+        glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
 
         glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 
@@ -264,21 +288,24 @@ int main(void)
         //glEnable(GL_DEPTH_TEST);
 
 
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, FBO);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, resolveFBO);
+        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height,
+            GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
 
 
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-
         screenShader.Use();
-        screenShader.SetFloat("pixelSize", 6.0f); // adjust to taste
+        screenShader.SetFloat("pixelSize", 6.0f);
         screenShader.SetVec2("resolution", glm::vec2(width, height));
         glBindVertexArray(quadVAO);
         glDisable(GL_DEPTH_TEST);
-        glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, resolveTex);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         gui.Render();
