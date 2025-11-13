@@ -132,5 +132,7 @@
     <None Include="resources\shaders\frame_buffer.glsl" />
     <None Include="resources\shaders\skybox_vert.glsl" />
     <None Include="resources\shaders\skybox_frag.glsl" />
+    <None Include="resources\shaders\reflection.glsl" />
+    <None Include="resources\shaders\refraction.glsl" />
   </ItemGroup>
 </Project>
